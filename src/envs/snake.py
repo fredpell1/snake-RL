@@ -24,16 +24,11 @@ class SnakeEnv(gym.Env):
         # We have 4 actions, corresponding to "right", "up", "left", "down", "right"
         self.action_space = spaces.Discrete(4)
 
-        """
-        The following dictionary maps abstract actions from `self.action_space` to 
-        the direction we will walk in if that action is taken.
-        I.e. 0 corresponds to "right", 1 to "up" etc.
-        """
         self._action_to_direction = {
-            0: np.array([1, 0]),
-            1: np.array([0, 1]),
-            2: np.array([-1, 0]),
-            3: np.array([0, -1]),
+            0: np.array([1, 0]), #right
+            1: np.array([0, 1]), #down
+            2: np.array([-1, 0]), #left
+            3: np.array([0, -1]), #up
         }
 
         assert render_mode is None or render_mode in self.metadata["render_modes"]
@@ -68,16 +63,24 @@ class SnakeEnv(gym.Env):
         super().reset(seed=seed)
 
         # Choose the agent's head location uniformly at random
-        self._head_location = self.np_random.integers(0, self.size, size=2, dtype=int)
+        self._head_location = self.np_random.integers(1, self.size-2, size=2, dtype=int)
 
         # Set the initial body location
-        # TODO: add checks to make sure body is not going out of the game
-        self._body_location = np.array(
-            [
-                [self._head_location[0], self._head_location[1] - 1],
-                [self._head_location[0], self._head_location[1] - 2],
-            ]
-        )
+        x,y = self._head_location[0], self._head_location[1]
+        if y > self.size / 2:
+            self._body_location = np.array(
+                [
+                    [x, y + 1],
+                    [x, y + 2]
+                ]
+           )
+        else:
+            self._body_location = np.array(
+                [
+                    [x, y - 1],
+                    [x, y - 2]
+                ]
+           )
 
         # We will sample the target's location randomly until it does not coincide with the agent's location
         # TODO: add check to make sure target does not overlap with body
@@ -100,12 +103,15 @@ class SnakeEnv(gym.Env):
         direction = self._action_to_direction[action]
         # We use `np.clip` to make sure we don't leave the grid
         head = self._head_location.copy()
-        self._head_location = np.clip(self._head_location + direction, 0, self.size - 1)
+        self._head_location = self._head_location + direction
+        
         # We move the body
-        for i, part in enumerate(self._body_location):
-            temp = head
+        for i,part in enumerate(self._body_location):
+            temp = head 
             head = part.copy()
             self._body_location[i] = temp
+
+        truncated = self._check_body_hit() or self._check_wall_hit()
 
         # An episode is done iff the agent has reached the target
         terminated = np.array_equal(self._head_location, self._target_location)
@@ -116,7 +122,19 @@ class SnakeEnv(gym.Env):
         if self.render_mode == "human" or self.render_mode == "rgb_array":
             self._render_frame()
 
-        return observation, reward, terminated, False, info
+        return observation, reward, terminated, truncated, info
+
+
+    def _check_wall_hit(self) -> bool:
+        x,y = self._head_location[0], self._head_location[1]
+        return x < 0 or x > (self.size - 1) or y < 0 or y > self.size - 1
+
+
+    def _check_body_hit(self) -> bool:
+        for part in self._body_location:
+            if np.array_equal(self._head_location, part):
+                return True
+        return False
 
     def render(self):
         if self.render_mode == "rgb_array":
@@ -157,9 +175,9 @@ class SnakeEnv(gym.Env):
         for parts in self._body_location:
             pygame.draw.circle(
                 canvas,
-                (0, 255, 0),
+                (1,50,32),
                 (parts + 0.5) * pix_square_size,
-                pix_square_size / 3,
+                pix_square_size / 3
             )
 
         # Finally, add some gridlines
