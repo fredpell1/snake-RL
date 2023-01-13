@@ -29,9 +29,11 @@ while play:
             elif event.key == pygame.K_DOWN:
                 move = 1
     observation, reward, terminated, truncated, info = env.step(move)
-    if terminated or truncated:
+    if truncated:
         env.reset()
         move = 3
+    if terminated:
+        env.eat_apple()
     
     
 

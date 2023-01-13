@@ -101,7 +101,8 @@ class SnakeEnv(gym.Env):
     def step(self, action):
         # Map the action (element of {0,1,2,3}) to the direction we walk in
         direction = self._action_to_direction[action]
-        # We use `np.clip` to make sure we don't leave the grid
+        
+        #updating the head
         head = self._head_location.copy()
         self._head_location = self._head_location + direction
         
@@ -124,6 +125,37 @@ class SnakeEnv(gym.Env):
 
         return observation, reward, terminated, truncated, info
 
+
+    def eat_apple(self):
+        #spawn apple randomly
+        while np.array_equal(self._target_location, self._head_location):
+            self._target_location = self.np_random.integers(
+                0, self.size, size=2, dtype=int
+            )
+        #grow body
+        x_head, y_head = self._head_location[0], self._head_location[1]
+        x_last, y_last = self._body_location[-1,0], self._body_location[-1,1]
+        
+        if y_head == y_last:
+            if x_head > x_last:
+                new_x = x_last + 1
+            else:
+                new_x = x_last - 1
+            new_y = y_last
+        else:
+            if x_head == x_last:
+                if y_head > y_last:
+                    new_y = y_last - 1
+                else:
+                    new_y = y_last + 1
+                new_x = x_last
+            elif x_head > x_last:
+                new_y = y_last
+                new_x = x_last - 1
+            else:
+                new_y = y_last
+                new_x = x_last + 1
+        self._body_location = np.append(self._body_location, [[new_x, new_y]], 0)
 
     def _check_wall_hit(self) -> bool:
         x,y = self._head_location[0], self._head_location[1]
