@@ -7,7 +7,9 @@ observation, info = env.reset()
 
 
 for _ in range(100):
-    action = env.action_space.sample()  # agent policy that uses the observation and info
+    action = (
+        env.action_space.sample()
+    )  # agent policy that uses the observation and info
     observation, reward, terminated, truncated, info = env.step(action)
     #print(observation)
     if terminated or truncated:

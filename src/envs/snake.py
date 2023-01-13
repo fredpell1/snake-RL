@@ -1,8 +1,9 @@
-#below code inspired from https://github.com/Farama-Foundation/gym-examples/blob/main/gym_examples/envs/grid_world.py
+# below code inspired from https://github.com/Farama-Foundation/gym-examples/blob/main/gym_examples/envs/grid_world.py
 import gymnasium as gym
 from gymnasium import spaces
 import pygame
 import numpy as np
+
 
 class SnakeEnv(gym.Env):
     metadata = {"render_modes": ["human", "rgb_array"], "render_fps": 4}
@@ -15,8 +16,8 @@ class SnakeEnv(gym.Env):
         # Each location is encoded as an element of {0, ..., `size`}^2, i.e. MultiDiscrete([size, size]).
         self.observation_space = spaces.Dict(
             {
-                "agent": spaces.Box(0, size - 1, shape=(1,2), dtype=int),
-                "target": spaces.Box(0, size - 1, shape=(1,2), dtype=int),
+                "agent": spaces.Box(0, size - 1, shape=(1, 2), dtype=int),
+                "target": spaces.Box(0, size - 1, shape=(1, 2), dtype=int),
             }
         )
 
@@ -52,8 +53,8 @@ class SnakeEnv(gym.Env):
         return {
             "agent": self._head_location,
             "body": self._body_location,
-            "target": self._target_location
-            }
+            "target": self._target_location,
+        }
 
     def _get_info(self):
         return {
@@ -71,10 +72,12 @@ class SnakeEnv(gym.Env):
 
         # Set the initial body location
         # TODO: add checks to make sure body is not going out of the game
-        self._body_location = np.array([
+        self._body_location = np.array(
+            [
                 [self._head_location[0], self._head_location[1] - 1],
-                [self._head_location[0], self._head_location[1] - 2]
-            ])
+                [self._head_location[0], self._head_location[1] - 2],
+            ]
+        )
 
         # We will sample the target's location randomly until it does not coincide with the agent's location
         # TODO: add check to make sure target does not overlap with body
