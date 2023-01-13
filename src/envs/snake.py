@@ -148,6 +148,13 @@ class SnakeEnv(gym.Env):
                 new_x = x_last + 1
         self._body_location = np.append(self._body_location, [[new_x, new_y]], 0)
 
+    def first_move(self):
+        
+        if self._head_location[1] > (self.size / 2):
+            return 3
+        else:
+            return 1
+
     def _check_wall_hit(self) -> bool:
         x, y = self._head_location[0], self._head_location[1]
         return x < 0 or x > (self.size - 1) or y < 0 or y > self.size - 1
