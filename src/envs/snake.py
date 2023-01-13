@@ -25,10 +25,10 @@ class SnakeEnv(gym.Env):
         self.action_space = spaces.Discrete(4)
 
         self._action_to_direction = {
-            0: np.array([1, 0]), #right
-            1: np.array([0, 1]), #down
-            2: np.array([-1, 0]), #left
-            3: np.array([0, -1]), #up
+            0: np.array([1, 0]),  # right
+            1: np.array([0, 1]),  # down
+            2: np.array([-1, 0]),  # left
+            3: np.array([0, -1]),  # up
         }
 
         assert render_mode is None or render_mode in self.metadata["render_modes"]
@@ -63,24 +63,16 @@ class SnakeEnv(gym.Env):
         super().reset(seed=seed)
 
         # Choose the agent's head location uniformly at random
-        self._head_location = self.np_random.integers(1, self.size-2, size=2, dtype=int)
+        self._head_location = self.np_random.integers(
+            1, self.size - 2, size=2, dtype=int
+        )
 
         # Set the initial body location
-        x,y = self._head_location[0], self._head_location[1]
+        x, y = self._head_location[0], self._head_location[1]
         if y > self.size / 2:
-            self._body_location = np.array(
-                [
-                    [x, y + 1],
-                    [x, y + 2]
-                ]
-           )
+            self._body_location = np.array([[x, y + 1], [x, y + 2]])
         else:
-            self._body_location = np.array(
-                [
-                    [x, y - 1],
-                    [x, y - 2]
-                ]
-           )
+            self._body_location = np.array([[x, y - 1], [x, y - 2]])
 
         # We will sample the target's location randomly until it does not coincide with the agent's location
         # TODO: add check to make sure target does not overlap with body
@@ -101,14 +93,14 @@ class SnakeEnv(gym.Env):
     def step(self, action):
         # Map the action (element of {0,1,2,3}) to the direction we walk in
         direction = self._action_to_direction[action]
-        
-        #updating the head
+
+        # updating the head
         head = self._head_location.copy()
         self._head_location = self._head_location + direction
-        
+
         # We move the body
-        for i,part in enumerate(self._body_location):
-            temp = head 
+        for i, part in enumerate(self._body_location):
+            temp = head
             head = part.copy()
             self._body_location[i] = temp
 
@@ -125,17 +117,16 @@ class SnakeEnv(gym.Env):
 
         return observation, reward, terminated, truncated, info
 
-
     def eat_apple(self):
-        #spawn apple randomly
+        # spawn apple randomly
         while np.array_equal(self._target_location, self._head_location):
             self._target_location = self.np_random.integers(
                 0, self.size, size=2, dtype=int
             )
-        #grow body
+        # grow body
         x_head, y_head = self._head_location[0], self._head_location[1]
-        x_last, y_last = self._body_location[-1,0], self._body_location[-1,1]
-        
+        x_last, y_last = self._body_location[-1, 0], self._body_location[-1, 1]
+
         if y_head == y_last:
             if x_head > x_last:
                 new_x = x_last + 1
@@ -158,9 +149,8 @@ class SnakeEnv(gym.Env):
         self._body_location = np.append(self._body_location, [[new_x, new_y]], 0)
 
     def _check_wall_hit(self) -> bool:
-        x,y = self._head_location[0], self._head_location[1]
+        x, y = self._head_location[0], self._head_location[1]
         return x < 0 or x > (self.size - 1) or y < 0 or y > self.size - 1
-
 
     def _check_body_hit(self) -> bool:
         for part in self._body_location:
@@ -207,9 +197,9 @@ class SnakeEnv(gym.Env):
         for parts in self._body_location:
             pygame.draw.circle(
                 canvas,
-                (1,50,32),
+                (1, 50, 32),
                 (parts + 0.5) * pix_square_size,
-                pix_square_size / 3
+                pix_square_size / 3,
             )
 
         # Finally, add some gridlines
