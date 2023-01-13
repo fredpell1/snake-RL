@@ -96,10 +96,15 @@ class SnakeEnv(gym.Env):
         # Map the action (element of {0,1,2,3}) to the direction we walk in
         direction = self._action_to_direction[action]
         # We use `np.clip` to make sure we don't leave the grid
+        head = self._head_location.copy()
         self._head_location = np.clip(
             self._head_location + direction, 0, self.size - 1
         )
-
+        # We move the body
+        for i,part in enumerate(self._body_location):
+            temp = head 
+            head = part.copy()
+            self._body_location[i] = temp
 
 
         # An episode is done iff the agent has reached the target
@@ -140,13 +145,22 @@ class SnakeEnv(gym.Env):
                 (pix_square_size, pix_square_size),
             ),
         )
-        # Now we draw the agent
+        # Now we draw the agent's head
         pygame.draw.circle(
             canvas,
-            (0, 0, 255),
+            (0, 255, 0),
             (self._head_location + 0.5) * pix_square_size,
             pix_square_size / 3,
         )
+
+        # Draw the body
+        for parts in self._body_location:
+            pygame.draw.circle(
+                canvas,
+                (0,255,0),
+                (parts + 0.5) * pix_square_size,
+                pix_square_size / 3
+            )
 
         # Finally, add some gridlines
         for x in range(self.size + 1):
