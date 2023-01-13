@@ -100,15 +100,12 @@ class SnakeEnv(gym.Env):
         direction = self._action_to_direction[action]
         # We use `np.clip` to make sure we don't leave the grid
         head = self._head_location.copy()
-        self._head_location = np.clip(
-            self._head_location + direction, 0, self.size - 1
-        )
+        self._head_location = np.clip(self._head_location + direction, 0, self.size - 1)
         # We move the body
-        for i,part in enumerate(self._body_location):
-            temp = head 
+        for i, part in enumerate(self._body_location):
+            temp = head
             head = part.copy()
             self._body_location[i] = temp
-
 
         # An episode is done iff the agent has reached the target
         terminated = np.array_equal(self._head_location, self._target_location)
@@ -160,9 +157,9 @@ class SnakeEnv(gym.Env):
         for parts in self._body_location:
             pygame.draw.circle(
                 canvas,
-                (0,255,0),
+                (0, 255, 0),
                 (parts + 0.5) * pix_square_size,
-                pix_square_size / 3
+                pix_square_size / 3,
             )
 
         # Finally, add some gridlines
