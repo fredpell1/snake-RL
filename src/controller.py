@@ -1,6 +1,6 @@
 import envs
 import pygame
-from agents import BaseAgent
+from agents.base_agent import BaseAgent
 import sys
 
 def user_mode(env: envs.SnakeEnv):
@@ -44,8 +44,10 @@ def agent_mode(env: envs.SnakeEnv, n_episodes: int, max_step: int, agent: BaseAg
             action = agent.select_action(observation)
             observation, reward, terminated, truncated, info = env.step(action)
             rewards.append(reward)
-            if terminated or truncated:
+            if truncated:
                 break
+            if terminated:
+                env.eat_apple()
     env.close()
     return rewards
 

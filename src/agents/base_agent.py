@@ -1,3 +1,5 @@
+import numpy as np
+
 class BaseAgent():
     """Main class for implementing reinforcement learning agents
 
@@ -5,7 +7,12 @@ class BaseAgent():
     overriden. 
     """
     def __init__(self) -> None:
-        pass
+        self._action_to_direction = {
+            0: np.array([1, 0]),  # right
+            1: np.array([0, 1]),  # down
+            2: np.array([-1, 0]),  # left
+            3: np.array([0, -1]),  # up
+        }
 
     def select_action(self, observation):
         raise NotImplementedError("You should implement this method in a subclass")
