@@ -4,7 +4,7 @@ from abc import abstractmethod, ABCMeta
 class BaseAgent(metaclass=ABCMeta):
     """Main class for implementing reinforcement learning agents
 
-    It must be extended by a subclass and the select_action method must be 
+    It must be extended by a subclass and its methods must be 
     overriden. 
     """
     def __init__(self) -> None:
