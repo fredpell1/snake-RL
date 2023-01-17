@@ -12,5 +12,3 @@ observation, info = env.reset()
 agent = heuristic_agent.HeuristicAgent()
 
 agent_mode(env, 10, 10, agent)
-
-

@@ -1,12 +1,14 @@
 import numpy as np
 from abc import abstractmethod, ABCMeta
 
+
 class BaseAgent(metaclass=ABCMeta):
     """Main class for implementing reinforcement learning agents
 
-    It must be extended by a subclass and its methods must be 
-    overriden. 
+    It must be extended by a subclass and its methods must be
+    overriden.
     """
+
     def __init__(self) -> None:
         self._action_to_direction = {
             0: np.array([1, 0]),  # right
@@ -24,13 +26,12 @@ class BaseAgent(metaclass=ABCMeta):
         raise NotImplementedError("You should implement this method in a subclass")
 
     @abstractmethod
-    def update(self,reward,observation,action,terminated):
+    def update(self, reward, observation, action, terminated):
         """This method will be called at every step of an episode after an action is taken,
         it is the agent's responsibility to keep track of the number of iterations, the previously taken actions,
-        etc. 
+        etc.
 
         Raises:
             NotImplementedError: This method should be implemented for all agents
         """
         raise NotImplementedError("You should implement this method in a subclass")
-

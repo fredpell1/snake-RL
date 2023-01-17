@@ -150,7 +150,7 @@ class SnakeEnv(gym.Env):
         return self._get_obs()
 
     def first_move(self):
-        
+
         if self._head_location[1] > (self.size / 2):
             return 3
         else:

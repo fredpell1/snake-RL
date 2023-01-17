@@ -3,12 +3,13 @@ import pygame
 from agents.base_agent import BaseAgent
 import sys
 
+
 def user_mode(env: envs.SnakeEnv):
     play = True
-    
+
     env.reset()
     move = env.first_move()
-    
+
     while play:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -26,7 +27,7 @@ def user_mode(env: envs.SnakeEnv):
                 elif event.key == pygame.K_DOWN:
                     move = 1
         observation, reward, terminated, truncated, info = env.step(move)
-        #print(reward)
+        # print(reward)
         if truncated:
             env.reset()
             move = env.first_move()
@@ -54,5 +55,3 @@ def agent_mode(env: envs.SnakeEnv, n_episodes: int, max_step: int, agent: BaseAg
         rewards.append(episode_reward)
     env.close()
     return rewards
-
-
