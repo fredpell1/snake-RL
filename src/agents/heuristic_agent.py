@@ -26,3 +26,9 @@ class HeuristicAgent(BaseAgent):
                     move = 2
                 
         return move
+
+    def reset(self):
+        self.prev_move = None
+
+    def update(self):
+        pass

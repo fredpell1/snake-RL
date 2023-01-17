@@ -147,6 +147,7 @@ class SnakeEnv(gym.Env):
                 new_y = y_last
                 new_x = x_last + 1
         self._body_location = np.append(self._body_location, [[new_x, new_y]], 0)
+        return self._get_obs()
 
     def first_move(self):
         

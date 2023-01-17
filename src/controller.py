@@ -26,7 +26,7 @@ def user_mode(env: envs.SnakeEnv):
                 elif event.key == pygame.K_DOWN:
                     move = 1
         observation, reward, terminated, truncated, info = env.step(move)
-        print(observation)
+        #print(reward)
         if truncated:
             env.reset()
             move = env.first_move()
@@ -39,15 +39,19 @@ def agent_mode(env: envs.SnakeEnv, n_episodes: int, max_step: int, agent: BaseAg
     max_step = max_step if max_step else sys.maxsize
     rewards = []
     for _ in range(n_episodes):
+        agent.reset()
         observation, info = env.reset()
+        episode_reward = 0
         for i in range(max_step):
             action = agent.select_action(observation)
             observation, reward, terminated, truncated, info = env.step(action)
-            rewards.append(reward)
+            episode_reward += reward
+            if terminated:
+                observation = env.eat_apple()
+            agent.update(reward, observation, action, terminated)
             if truncated:
                 break
-            if terminated:
-                env.eat_apple()
+        rewards.append(episode_reward)
     env.close()
     return rewards
 
