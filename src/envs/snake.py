@@ -107,9 +107,12 @@ class SnakeEnv(gym.Env):
         terminated = self._check_body_hit() or self._check_wall_hit()
 
         target = np.array_equal(self._head_location, self._target_location)
-        if target: reward = 1
-        elif terminated: reward = -1
-        else: reward = 0
+        if target:
+            reward = 1
+        elif terminated:
+            reward = -1
+        else:
+            reward = 0
         observation = self._get_obs()
         info = self._get_info()
 

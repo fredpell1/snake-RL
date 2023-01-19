@@ -45,7 +45,7 @@ def agent_mode(env: envs.SnakeEnv, n_episodes: int, max_step: int, agent: BaseAg
         episode_reward = 0
         for i in range(max_step):
             action = agent.select_action(observation)
-            observation, reward,target, terminated, info = env.step(action)
+            observation, reward, target, terminated, info = env.step(action)
             episode_reward += reward
             print(i, reward)
             if target:
