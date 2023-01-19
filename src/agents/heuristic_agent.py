@@ -1,6 +1,7 @@
 from agents.base_agent import BaseAgent
 import numpy as np
 
+
 class HeuristicAgent(BaseAgent):
     def __init__(self) -> None:
         super().__init__()
@@ -12,7 +13,7 @@ class HeuristicAgent(BaseAgent):
         body = observation["body"]
         move = self.prev_move if self.prev_move else 0
         min_distance = 100
-        for key,value in self._action_to_direction.items():
+        for key, value in self._action_to_direction.items():
             next_state = head + value
             distance = np.linalg.norm(next_state - target, 1)
             if distance < min_distance:

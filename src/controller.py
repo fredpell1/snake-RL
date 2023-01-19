@@ -36,7 +36,9 @@ def user_mode(env: envs.SnakeEnv):
     env.close()
 
 
-def agent_mode(env: envs.SnakeEnv, n_episodes: int, agent: BaseAgent, max_step: int = None):
+def agent_mode(
+    env: envs.SnakeEnv, n_episodes: int, agent: BaseAgent, max_step: int = None
+):
     max_step = max_step if max_step else sys.maxsize
     rewards = []
     for _ in range(n_episodes):

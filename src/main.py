@@ -10,4 +10,4 @@ env = envs.SnakeEnv(render_mode="human", size=10)
 observation, info = env.reset()
 
 agent = heuristic_agent.HeuristicAgent()
-agent_mode(env = env, n_episodes = 1, agent = agent)
+agent_mode(env=env, n_episodes=1, agent=agent)
