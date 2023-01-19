@@ -104,18 +104,19 @@ class SnakeEnv(gym.Env):
             head = part.copy()
             self._body_location[i] = temp
 
-        truncated = self._check_body_hit() or self._check_wall_hit()
+        terminated = self._check_body_hit() or self._check_wall_hit()
 
-        # An episode is done iff the agent has reached the target
-        terminated = np.array_equal(self._head_location, self._target_location)
-        reward = 1 if terminated else 0  # Binary sparse rewards
+        target = np.array_equal(self._head_location, self._target_location)
+        if target: reward = 1
+        elif terminated: reward = -1
+        else: reward = 0
         observation = self._get_obs()
         info = self._get_info()
 
         if self.render_mode == "human" or self.render_mode == "rgb_array":
             self._render_frame()
 
-        return observation, reward, terminated, truncated, info
+        return observation, reward, target, terminated, info
 
     def eat_apple(self):
         # spawn apple randomly

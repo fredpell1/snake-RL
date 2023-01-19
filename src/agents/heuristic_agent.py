@@ -30,5 +30,5 @@ class HeuristicAgent(BaseAgent):
     def reset(self):
         self.prev_move = None
 
-    def update(self):
+    def update(self, reward, observation, action, terminated):
         pass
