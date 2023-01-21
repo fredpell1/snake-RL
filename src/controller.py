@@ -49,7 +49,6 @@ def agent_mode(
             action = agent.select_action(observation)
             observation, reward, target, terminated, info = env.step(action)
             episode_reward += reward
-            print(i, reward)
             if target:
                 observation = env.eat_apple()
             agent.update(reward, observation, action, terminated)
