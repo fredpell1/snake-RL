@@ -112,7 +112,7 @@ class SnakeEnv(gym.Env):
         elif terminated:
             reward = -1
         else:
-            reward = 0
+            reward = -0.1
         observation = self._get_obs()
         info = self._get_info()
 

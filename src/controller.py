@@ -37,7 +37,11 @@ def user_mode(env: envs.SnakeEnv):
 
 
 def agent_mode(
-    env: envs.SnakeEnv, n_episodes: int, agent: BaseAgent, max_step: int = None
+    env: envs.SnakeEnv,
+    n_episodes: int,
+    agent: BaseAgent,
+    max_step: int = None,
+    mode: str = "training",
 ):
     max_step = max_step if max_step else sys.maxsize
     rewards = []
@@ -49,10 +53,10 @@ def agent_mode(
             action = agent.select_action(observation)
             observation, reward, target, terminated, info = env.step(action)
             episode_reward += reward
-            print(i, reward)
             if target:
                 observation = env.eat_apple()
-            agent.update(reward, observation, action, terminated)
+            if mode == "training":
+                agent.update(reward, observation, action, terminated)
             if terminated:
                 break
         rewards.append(episode_reward)
