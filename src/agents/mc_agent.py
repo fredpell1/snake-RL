@@ -18,12 +18,12 @@ class MonteCarloNN(BaseAgent):
     ) -> None:
         super().__init__()
         self.value_function = torch.nn.Sequential(
-            #torch.nn.LayerNorm(input_size),
+            # torch.nn.LayerNorm(input_size),
             torch.nn.Linear(input_size, hidden_size),
             torch.nn.Sigmoid(),
-            torch.nn.Linear(hidden_size,hidden_size),
+            torch.nn.Linear(hidden_size, hidden_size),
             torch.nn.Sigmoid(),
-            torch.nn.Linear(hidden_size, 1)
+            torch.nn.Linear(hidden_size, 1),
         )
         if value_function:
             self.value_function.load_state_dict(value_function)
@@ -43,7 +43,7 @@ class MonteCarloNN(BaseAgent):
         self.losses = []
         self.random_count = 0
         self.greedy_count = 0
-        self.action_count = [0,0,0,0]
+        self.action_count = [0, 0, 0, 0]
         self.mode = mode
 
     def select_action(self, observation):
@@ -64,7 +64,7 @@ class MonteCarloNN(BaseAgent):
             else:
                 max_index = np.random.randint(0, 3 + 1)
                 self.random_count += 1
-        
+
         self.action_count[max_index] += 1
         return max_index
 
@@ -94,9 +94,9 @@ class MonteCarloNN(BaseAgent):
     def eval(self):
         self.epsilon = -1
         self.mode = "testing"
-        self.action_count = [0,0,0,0]
+        self.action_count = [0, 0, 0, 0]
         self.greedy_count = 0
-        self.random_count  = 0
+        self.random_count = 0
 
     def _get_state_from_obs(self, observation):
         head = observation["agent"]
