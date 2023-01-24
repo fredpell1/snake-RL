@@ -61,8 +61,6 @@ class MonteCarloNN(BaseAgent):
                     if value.item() > max_value:
                         max_value = value.item()
                         max_index = action_index
-                    if self.mode == 'testing':
-                        print(action_index, value.item())
             else:
                 max_index = np.random.randint(0, 3 + 1)
                 self.random_count += 1

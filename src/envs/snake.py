@@ -108,11 +108,11 @@ class SnakeEnv(gym.Env):
 
         target = np.array_equal(self._head_location, self._target_location)
         if target:
-            reward = 20
+            reward = 1
         elif terminated:
-            reward = -10
-        else:
             reward = -1
+        else:
+            reward = -0.1
         observation = self._get_obs()
         info = self._get_info()
 
