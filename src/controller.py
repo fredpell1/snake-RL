@@ -54,7 +54,7 @@ def agent_mode(
             observation, reward, target, terminated, info = env.step(action)
             episode_reward += reward
             if target:
-                observation = env.eat_apple()
+                env.eat_apple()
             if mode == "training":
                 agent.update(reward, observation, action, terminated)
             if terminated:

@@ -27,7 +27,7 @@ class MonteCarloNN(BaseAgent):
         )
         if value_function:
             self.value_function.load_state_dict(value_function)
-        self.epsilon = epsilon if mode == "training" else -1
+        self.epsilon = epsilon if mode == "training" else epsilon #-1
         self.gamma = gamma  # discount factor
         self.state_sequence = []
         self.prev_state = None
@@ -92,7 +92,7 @@ class MonteCarloNN(BaseAgent):
         )
 
     def eval(self):
-        self.epsilon = -1
+        self.epsilon /= 100
         self.mode = "testing"
         self.action_count = [0, 0, 0, 0]
         self.greedy_count = 0
