@@ -25,10 +25,23 @@ class TDLambdaNN(BaseAgent):
         self.lambda_ = lambda_
         self.input_size = input_size
         self.hidden_size = hidden_size
-        self.value_function = value_function
-        self.optimizer = optimizer
-        self.value_function = value_function
-        self.loss_function = loss_function
+
+        self.value_function = torch.nn.Sequential(
+            torch.nn.Linear(input_size, hidden_size),
+            torch.nn.Sigmoid(),
+            torch.nn.Linear(hidden_size, hidden_size),
+            torch.nn.Sigmoid(),
+            torch.nn.Linear(hidden_size, 1)
+        )
+        if value_function:
+            self.value_function.load_state_dict(value_function)
+        self.optimizer = torch.optim.SGD(self.value_function.parameters(), lr=learning_rate)
+        if optimizer:
+            self.optimizer.load_state_dict(optimizer)
+        self.loss_function = torch.nn.MSELoss()
+        if loss_function:
+            self.loss_function.load_state_dict(loss_function)
+        
         self.mode = mode
 
 
@@ -39,7 +52,6 @@ class TDLambdaNN(BaseAgent):
         with torch.no_grad():
             p = np.random.random()
             if p > self.epsilon:
-                self.greedy_count += 1
                 for action_index, move in self._action_to_direction.items():
                     state_tensor = self.prev_state.clone()
                     state_tensor[:2, :] += torch.from_numpy(move).reshape((-1, 1))
@@ -49,19 +61,18 @@ class TDLambdaNN(BaseAgent):
                         max_index = action_index
             else:
                 max_index = np.random.randint(0, 3 + 1)
-                self.random_count += 1
 
-        self.action_count[max_index] += 1
         return max_index
 
     def update(self, reward, observation, action, terminated):
         #we voluntiraly don't zero grad the optimizer to consider eligibility traces
         for parameter in self.value_function.parameters():
-            parameter *= self.gamma * self.lambda_
+            if parameter.grad is not None:
+                parameter.grad *= self.gamma * self.lambda_
         
-        s_prime = self._get_state_from_obs(observation)
+        s_prime = self._get_state_from_obs(observation).T
         td_target = torch.tensor(reward) + self.gamma * self.value_function(s_prime)
-        loss = self.loss_function(self.value_function(self.prev_state), td_target)
+        loss = self.loss_function(self.value_function(self.prev_state.T), td_target)
         loss.backward()
         self.optimizer.step()
         return loss.item()
@@ -77,7 +88,6 @@ class TDLambdaNN(BaseAgent):
                 "value_function": self.value_function.state_dict(),
                 "optimizer_state": self.optimizer.state_dict(),
                 "loss": self.loss_function.state_dict(),
-                "losses": self.losses,
             },
         filename,
     )
@@ -85,9 +95,7 @@ class TDLambdaNN(BaseAgent):
     def eval(self):
         self.epsilon /= 100
         self.mode = "testing"
-        self.action_count = [0, 0, 0, 0]
-        self.greedy_count = 0
-        self.random_count = 0
+
 
     def _get_state_from_obs(self,observation):
         #TODO make this a function in the base agent

@@ -1,41 +1,41 @@
-import gymnasium as gym
-import envs
-import numpy as np
-from gymnasium import spaces
-import pygame
 from controller import user_mode, agent_mode
-from agents import heuristic_agent, mc_agent
-import torch
+from util import *
+from agents import heuristic_agent, mc_agent, td_agent
+from argparse import ArgumentParser
+
+def main(new, filename, n_episodes):
+    if new:
+        agent = initialize_new_agent(
+            td_agent.TDLambdaNN,
+            epsilon=0.1,
+            gamma = 0.5,
+            learning_rate = 0.001,
+            lambda_ = 0.1,
+            input_size = 6,
+            hidden_size = 50,
+            value_function=None,
+            optimizer=None,
+            loss_function = None
+            )
+    else:
+        agent = load_agent(
+            td_agent.TDLambdaNN,
+            filename=filename,
+            epsilon=0.1,
+            gamma = 0.5,
+            learning_rate = 0.001,
+            lambda_ = 0.1,
+            input_size = 6,
+            hidden_size = 50
+        )
+    train_and_save(agent, n_episodes, 500, filename)
+    test(agent, 20, 100)
 
 
-# load pretrained
-env = envs.SnakeEnv(size=10)
-observation, info = env.reset()
-checkpoint = torch.load("saved_agent/MC-v2")
-# agent = mc_agent.MonteCarloNN(0.1,0.1)
-# agent.save('saved_agent/MC-v2')
-# exit(0)
-agent = mc_agent.MonteCarloNN(
-    0.1,
-    0.5,
-    value_function=checkpoint["value_function"],
-    optimizer=checkpoint["optimizer_state"],
-    loss_function=checkpoint["loss"],
-    mode="training",
-    learning_rate=0.001,
-)
-# train and save pretrained
-for _ in range(3):
-    agent_mode(env=env, n_episodes=50000, agent=agent, max_step=1000)
-    agent.save("saved_agent/MC-v2")
-    print("training")
-    print(agent.greedy_count, agent.random_count)
-    print(agent.action_count)
-
-# test trained model
-env = envs.SnakeEnv(render_mode="human", size=10)
-agent.eval()
-agent_mode(env, 1, agent, mode="testing", max_step=1000)
-print("testing")
-print(agent.greedy_count, agent.random_count)
-print(agent.action_count)
+if __name__ == '__main__':
+    parser = ArgumentParser()
+    parser.add_argument('-n', '--new', action='store_true')
+    parser.add_argument('-f', '--file')
+    parser.add_argument('-e', '--episodes', type=int)
+    args = parser.parse_args()
+    main(args.new, args.file, args.episodes)
