@@ -9,7 +9,7 @@ def main(new, filename, n_episodes):
             td_agent.TDLambdaNN,
             epsilon=0.1,
             gamma = 0.5,
-            learning_rate = 0.001,
+            learning_rate = 0.00001,
             lambda_ = 0.1,
             input_size = 6,
             hidden_size = 50,
@@ -23,13 +23,13 @@ def main(new, filename, n_episodes):
             filename=filename,
             epsilon=0.1,
             gamma = 0.5,
-            learning_rate = 0.001,
+            learning_rate = 0.00001,
             lambda_ = 0.1,
             input_size = 6,
             hidden_size = 50
         )
     train_and_save(agent, n_episodes, 500, filename)
-    test(agent, 20, 100)
+    test(agent, 1, 100)
 
 
 if __name__ == '__main__':
