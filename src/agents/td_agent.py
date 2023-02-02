@@ -28,14 +28,12 @@ class TDLambdaNN(BaseAgent):
         with torch.no_grad():
             p = np.random.random()
             if self.epsilon < p:
-                print('hey')
                 values = [
                     self.value_function(self._get_state_from_obs(self._take_step(observation, action))).numpy()
                     for action in self._action_to_direction.keys()
                 ]
                 return np.argmax(values)
             else:
-                print('not hey')
                 return np.random.randint(0, 3 + 1)
 
     def update(self, reward, observation, action, terminated):
@@ -65,8 +63,8 @@ class TDLambdaNN(BaseAgent):
         target = observation["target"]
         body = observation["body"]
         vector = torch.full((100,1), -1.0)
-        vector[10*head[1]+head[0]] += 2
-        vector[10*target[1] + target[0]] += 3
+        vector[10*head[1]- 10 +head[0]] += 2
+        vector[10*target[1] - 10 + target[0]] += 3
         for part in body:
-            vector[10*part[1] + part[0]] += 1
+            vector[10*part[1] - 10 + part[0]] += 1
         return vector.T

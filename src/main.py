@@ -8,7 +8,7 @@ def main(config_file, agent_folder, n_episodes, output_file):
     agent, file = load_config_file(td_agent.TDLambdaNN, config_file, agent_folder)
     
     train_and_save(agent, n_episodes, 500, file, output_file)
-    test(agent, 1, 100)
+    test(agent, 10, 100)
 
 
 if __name__ == '__main__':

@@ -71,8 +71,8 @@ class BaseAgent(metaclass=ABCMeta):
 
     def _take_step(self, observation, action):
         direction = self._action_to_direction[action]
-        head = observation['agent']
-        body = observation['body']
+        head = observation['agent'].copy()
+        body = observation['body'].copy()
         # updating the head
         head_copy = head.copy()
         head += direction
@@ -85,7 +85,7 @@ class BaseAgent(metaclass=ABCMeta):
         return {
             'agent': head,
             'body': body,
-            'target': observation['target']
+            'target': observation['target'].copy()
         }
 
     def save(self, filename):
