@@ -47,11 +47,11 @@ def load_config_file(agent, config_file, saved_agent_folder):
     
 
 
-def train_and_save(agent, n_episodes, max_step, filename):
+def train_and_save(agent, n_episodes, max_step, filename, output_file):
     env = envs.SnakeEnv(size=10)
     _,_ = env.reset()
     rewards = agent_mode(env=env, n_episodes=n_episodes, agent=agent, max_step=max_step)
-    with open('outputs/output.txt', 'ab') as f:
+    with open(output_file, 'ab') as f:
         f.write(b'\n')
         np.savetxt(f, rewards)
     agent.save(filename)

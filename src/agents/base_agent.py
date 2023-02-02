@@ -50,6 +50,7 @@ class BaseAgent(metaclass=ABCMeta):
 
 
     def select_action(self, observation):
+        #broken
         self.prev_state = self._get_state_from_obs(observation)
         max_value = -100
         max_index = 0
@@ -67,6 +68,25 @@ class BaseAgent(metaclass=ABCMeta):
                 max_index = np.random.randint(0, 3 + 1)
 
         return max_index
+
+    def _take_step(self, observation, action):
+        direction = self._action_to_direction[action]
+        head = observation['agent']
+        body = observation['body']
+        # updating the head
+        head_copy = head.copy()
+        head += direction
+
+        # We move the body
+        for i, part in enumerate(body):
+            temp = head_copy
+            head_copy = part.copy()
+            body[i] = temp
+        return {
+            'agent': head,
+            'body': body,
+            'target': observation['target']
+        }
 
     def save(self, filename):
         torch.save(

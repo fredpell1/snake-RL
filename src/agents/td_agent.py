@@ -23,6 +23,20 @@ class TDLambdaNN(BaseAgent):
         self.lambda_ = lambda_
         self.mode = mode
 
+    def select_action(self, observation):
+        self.prev_state = self._get_state_from_obs(observation)
+        with torch.no_grad():
+            p = np.random.random()
+            if self.epsilon < p:
+                print('hey')
+                values = [
+                    self.value_function(self._get_state_from_obs(self._take_step(observation, action))).numpy()
+                    for action in self._action_to_direction.keys()
+                ]
+                return np.argmax(values)
+            else:
+                print('not hey')
+                return np.random.randint(0, 3 + 1)
 
     def update(self, reward, observation, action, terminated):
         #we voluntiraly don't zero grad the optimizer to have eligibility traces
@@ -30,9 +44,9 @@ class TDLambdaNN(BaseAgent):
             if parameter.grad is not None:
                 parameter.grad *= self.gamma * self.lambda_
         
-        s_prime = self._get_state_from_obs(observation).T
+        s_prime = self._get_state_from_obs(observation)
         td_target = torch.tensor(reward) + self.gamma * self.value_function(s_prime)
-        loss = self.loss_function(self.value_function(self.prev_state.T), td_target)
+        loss = self.loss_function(self.value_function(self.prev_state), td_target)
         loss.backward()
         self.optimizer.step()
         return loss.item()
@@ -47,4 +61,12 @@ class TDLambdaNN(BaseAgent):
         self.mode = "testing"
 
     def _get_state_from_obs(self, observation):
-        return super()._get_state_from_obs(observation)
+        head = observation["agent"]
+        target = observation["target"]
+        body = observation["body"]
+        vector = torch.full((100,1), -1.0)
+        vector[10*head[1]+head[0]] += 2
+        vector[10*target[1] + target[0]] += 3
+        for part in body:
+            vector[10*part[1] + part[0]] += 1
+        return vector.T
