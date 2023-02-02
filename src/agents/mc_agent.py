@@ -23,7 +23,6 @@ class MonteCarloNN(BaseAgent):
         self.losses = []
         self.mode = mode
 
-
     def reset(self):
         self.state_sequence = []
 
@@ -36,11 +35,9 @@ class MonteCarloNN(BaseAgent):
             loss = self._train(Gs)
             self.losses.append(loss)
 
-
     def eval(self):
         self.epsilon /= 100
         self.mode = "testing"
-
 
     def _compute_Gs(self):
         G = self.state_sequence[-1][-1]

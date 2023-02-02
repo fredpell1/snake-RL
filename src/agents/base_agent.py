@@ -2,6 +2,7 @@ import numpy as np
 from abc import abstractmethod, ABCMeta
 import torch
 
+
 class BaseAgent(metaclass=ABCMeta):
     """Main class for implementing reinforcement learning agents
 
@@ -17,9 +18,9 @@ class BaseAgent(metaclass=ABCMeta):
             3: np.array([0, -1]),  # up
         }
 
-        self.value_function : torch.nn.Module = value_function
-        self.optimizer : torch.nn.Module = optimizer
-        self.loss_function : torch.nn.Module = loss_function
+        self.value_function: torch.nn.Module = value_function
+        self.optimizer: torch.nn.Module = optimizer
+        self.loss_function: torch.nn.Module = loss_function
 
     @abstractmethod
     def select_action(self, observation):
@@ -40,17 +41,15 @@ class BaseAgent(metaclass=ABCMeta):
         """
         raise NotImplementedError("You should implement this method in a subclass")
 
-
-    def _get_state_from_obs(self,observation):
+    def _get_state_from_obs(self, observation):
         head = observation["agent"]
         target = observation["target"]
         body = observation["body"]
         state_array = np.concatenate((head, target, body[0]), dtype=np.float32)
         return torch.from_numpy(state_array).reshape((-1, 1))
 
-
     def select_action(self, observation):
-        #broken
+        # broken
         self.prev_state = self._get_state_from_obs(observation)
         max_value = -100
         max_index = 0
@@ -71,8 +70,8 @@ class BaseAgent(metaclass=ABCMeta):
 
     def _take_step(self, observation, action):
         direction = self._action_to_direction[action]
-        head = observation['agent'].copy()
-        body = observation['body'].copy()
+        head = observation["agent"].copy()
+        body = observation["body"].copy()
         # updating the head
         head_copy = head.copy()
         head += direction
@@ -82,11 +81,7 @@ class BaseAgent(metaclass=ABCMeta):
             temp = head_copy
             head_copy = part.copy()
             body[i] = temp
-        return {
-            'agent': head,
-            'body': body,
-            'target': observation['target'].copy()
-        }
+        return {"agent": head, "body": body, "target": observation["target"].copy()}
 
     def save(self, filename):
         torch.save(
