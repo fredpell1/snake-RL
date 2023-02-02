@@ -9,7 +9,7 @@ class BaseAgent(metaclass=ABCMeta):
     overriden.
     """
 
-    def __init__(self) -> None:
+    def __init__(self, value_function, optimizer, loss_function) -> None:
         self._action_to_direction = {
             0: np.array([1, 0]),  # right
             1: np.array([0, 1]),  # down
@@ -17,9 +17,9 @@ class BaseAgent(metaclass=ABCMeta):
             3: np.array([0, -1]),  # up
         }
 
-        self.value_function : torch.nn.Module = None
-        self.optimizer : torch.nn.Module = None
-        self.loss_function : torch.nn.Module = None
+        self.value_function : torch.nn.Module = value_function
+        self.optimizer : torch.nn.Module = optimizer
+        self.loss_function : torch.nn.Module = loss_function
 
     @abstractmethod
     def select_action(self, observation):
@@ -77,3 +77,6 @@ class BaseAgent(metaclass=ABCMeta):
             },
             filename,
         )
+
+    def eval(self):
+        return None

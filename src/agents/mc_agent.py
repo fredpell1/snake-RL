@@ -9,37 +9,17 @@ class MonteCarloNN(BaseAgent):
         epsilon,
         gamma,
         learning_rate=0.01,
-        input_size=6,
-        hidden_size=50,
         value_function=None,
         optimizer=None,
         loss_function=None,
         mode="training",
     ) -> None:
-        super().__init__()
-        self.value_function = torch.nn.Sequential(
-            # torch.nn.LayerNorm(input_size),
-            torch.nn.Linear(input_size, hidden_size),
-            torch.nn.Sigmoid(),
-            torch.nn.Linear(hidden_size, hidden_size),
-            torch.nn.Sigmoid(),
-            torch.nn.Linear(hidden_size, 1),
-        )
-        if value_function:
-            self.value_function.load_state_dict(value_function)
-        self.epsilon = epsilon if mode == "training" else epsilon #-1
+        super().__init__(value_function, optimizer, loss_function)
+        self.epsilon = epsilon
         self.gamma = gamma  # discount factor
         self.state_sequence = []
         self.prev_state = None
         self.learning_rate = learning_rate
-        self.loss_function = torch.nn.MSELoss()
-        if loss_function:
-            self.loss_function.load_state_dict(loss_function)
-        self.optimizer = torch.optim.SGD(
-            self.value_function.parameters(), lr=self.learning_rate
-        )
-        if optimizer:
-            self.optimizer.load_state_dict(optimizer)
         self.losses = []
         self.mode = mode
 

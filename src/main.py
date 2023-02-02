@@ -1,33 +1,12 @@
-from controller import user_mode, agent_mode
-from util import *
+from utils.controller import user_mode, agent_mode
+from utils.util import *
 from agents import heuristic_agent, mc_agent, td_agent
 from argparse import ArgumentParser
+import yaml
 
 def main(new, filename, n_episodes):
-    if new:
-        agent = initialize_new_agent(
-            td_agent.TDLambdaNN,
-            epsilon=0.1,
-            gamma = 0.5,
-            learning_rate = 0.00001,
-            lambda_ = 0.1,
-            input_size = 6,
-            hidden_size = 50,
-            value_function=None,
-            optimizer=None,
-            loss_function = None
-            )
-    else:
-        agent = load_agent(
-            td_agent.TDLambdaNN,
-            filename=filename,
-            epsilon=0.1,
-            gamma = 0.5,
-            learning_rate = 0.00001,
-            lambda_ = 0.1,
-            input_size = 6,
-            hidden_size = 50
-        )
+    agent = load_config_file(td_agent.TDLambdaNN, 'configs/TD-V2.yaml', 'saved_agent')
+    
     train_and_save(agent, n_episodes, 500, filename)
     test(agent, 1, 100)
 
