@@ -39,7 +39,7 @@ def load_config_file(agent, config_file, saved_agent_folder):
                 training_functions['optimizer'].load_state_dict(checkpoint['optimizer_state'])
                 training_functions['loss_function'].load_state_dict(checkpoint['loss'])
         
-        return agent(**agent_params,**training_functions)
+        return agent(**agent_params,**training_functions), f"{saved_agent_folder}/{version}"
                 
     
     except KeyError:
