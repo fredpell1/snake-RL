@@ -35,7 +35,23 @@ class TDLambdaNN(BaseAgent):
                 ]
                 return np.argmax(values)
             else:
-                return np.random.randint(0, 3 + 1)
+                return self._pick_randomly(observation)
+
+
+    def _pick_randomly(self,observation):
+        head = observation['agent']
+        body = observation['body'][0]
+        if head[0] == body[0]:
+            if head[1] > body[1]:
+                return np.random.choice([0,1,2])
+            else:
+                return np.random.choice([2,3,0])
+        if head[1] == body[1]:
+            if head[0] > body[0]:
+                return np.random.choice([0,3,1])
+            else:
+                return np.random.choice([2,3,1])
+
 
     def update(self, reward, observation, action, terminated):
         # we voluntiraly don't zero grad the optimizer to have eligibility traces
