@@ -112,7 +112,9 @@ class SnakeEnv(gym.Env):
         elif terminated:
             reward = -1
         else:
-            reward = 0#1/(np.linalg.norm(self._head_location - self._target_location, 2))
+            reward = (
+                0  # 1/(np.linalg.norm(self._head_location - self._target_location, 2))
+            )
         observation = self._get_obs()
         info = self._get_info()
 
