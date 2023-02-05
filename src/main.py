@@ -1,40 +1,27 @@
-import gymnasium as gym
-import envs
-import numpy as np
-from gymnasium import spaces
-import pygame
-from controller import user_mode, agent_mode
-from agents import heuristic_agent, mc_agent
-import torch
+from utils.controller import user_mode, agent_mode
+from utils.util import *
+from agents import heuristic_agent, mc_agent, td_agent
+from argparse import ArgumentParser
+import yaml
 
-# load pretrained
-env = envs.SnakeEnv(size=10)
-observation, info = env.reset()
-checkpoint = torch.load("saved_agent/MC-v1")
-# agent = mc_agent.MonteCarloNN(0.1,0.1)
-# agent.save('saved_agent/MC-v1')
-# exit(0)
-agent = mc_agent.MonteCarloNN(
-    0.1,
-    0.5,
-    value_function=checkpoint["value_function"],
-    optimizer=checkpoint["optimizer_state"],
-    loss_function=checkpoint["loss"],
-    mode="training",
-    learning_rate=0.001,
-)
-# train and save pretrained
-for _ in range(3):
-    agent_mode(env=env, n_episodes=50000, agent=agent, max_step=1000)
-    agent.save("saved_agent/MC-v1")
-    print("training")
-    print(agent.greedy_count, agent.random_count)
-    print(agent.action_count)
 
-# test trained model
-env = envs.SnakeEnv(render_mode="human", size=10)
-agent.eval()
-agent_mode(env, 25, agent, mode="testing", max_step=1000)
-print("testing")
-print(agent.greedy_count, agent.random_count)
-print(agent.action_count)
+def main(config_file, agent_folder, n_episodes, output_file):
+    agent, file = load_config_file(td_agent.TDLambdaNN, config_file, agent_folder)
+
+    train_and_save(agent, n_episodes, 500, file, output_file)
+    test(agent, 10, 100)
+
+
+if __name__ == "__main__":
+    parser = ArgumentParser()
+    parser.add_argument("-c", "--config")
+    parser.add_argument("-e", "--episodes", type=int)
+    parser.add_argument("-f", "--folder", default="saved_agent")
+    parser.add_argument("-o", "--output")
+    args = parser.parse_args()
+    main(
+        config_file=args.config,
+        n_episodes=args.episodes,
+        agent_folder=args.folder,
+        output_file=args.output,
+    )
