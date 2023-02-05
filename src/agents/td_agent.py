@@ -14,7 +14,7 @@ class TDLambdaNN(BaseAgent):
         optimizer,
         loss_function,
         mode="training",
-        subset_actions = False
+        subset_actions = False,
     ) -> None:
         super().__init__(value_function, optimizer, loss_function)
         self.epsilon = epsilon
