@@ -22,10 +22,7 @@ class BaseAgent(metaclass=ABCMeta):
         self.optimizer: torch.nn.Module = optimizer
         self.loss_function: torch.nn.Module = loss_function
 
-    @abstractmethod
-    def select_action(self, observation):
-        raise NotImplementedError("You should implement this method in a subclass")
-
+   
     @abstractmethod
     def reset(self):
         raise NotImplementedError("You should implement this method in a subclass")
@@ -92,6 +89,24 @@ class BaseAgent(metaclass=ABCMeta):
             },
             filename,
         )
+
+
+    def _subset_actions(self, observation):
+        head = observation["agent"]
+        body = observation["body"][0]
+        if head[0] == body[0]:
+            if head[1] > body[1]:
+                return [0, 1, 2]
+            else:
+                return [2, 3, 0]
+        if head[1] == body[1]:
+            if head[0] > body[0]:
+                return [0, 3, 1]
+            else:
+                return [2, 3, 1]
+
+    def _pick_randomly(self, observation):
+        return np.random.choice(self._subset_actions(observation))
 
     def eval(self):
         return None
