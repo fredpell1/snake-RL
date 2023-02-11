@@ -1,0 +1,14 @@
+# This CITATION.cff file was generated with cffinit.
+# Visit https://bit.ly/cffinit to generate yours today!
+
+cff-version: 1.2.0
+title: SnakeRL
+message: >-
+  If you use this software, please cite it using the
+  metadata from this file.
+type: software
+authors:
+  - given-names: Frederic
+    family-names: Pelletier
+    email: fredericpelletier7@gmail.com
+repository-code: 'https://github.com/fredpell1/snake-RL'
