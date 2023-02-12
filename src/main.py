@@ -6,10 +6,10 @@ import yaml
 
 
 def main(config_file, agent_folder, n_episodes, output_file):
-    agent, file = load_config_file(td_agent.TDLambdaNN, config_file, agent_folder)
-
+    agent = get_agent_type(config_file)
+    agent, file = load_config_file(agent, config_file, agent_folder)
     train_and_save(agent, n_episodes, 500, file, output_file)
-    test(agent, 10, 100)
+    test(agent, 10, 50)
 
 
 if __name__ == "__main__":

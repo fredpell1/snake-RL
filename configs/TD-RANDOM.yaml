@@ -1,5 +1,5 @@
 agent_params:
-  epsilon: 0.1
+  epsilon: 1.0
   gamma: 0.99
   lambda_: 0.9
   learning_rate: 0.0001

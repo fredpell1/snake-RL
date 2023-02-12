@@ -59,8 +59,6 @@ def agent_mode(
                 agent.update(reward, observation, action, terminated)
             if terminated:
                 break
-            if i == max_step - 1 and episode_reward == 0:
-                episode_reward -= 1
         rewards.append(episode_reward)
     env.close()
     return rewards

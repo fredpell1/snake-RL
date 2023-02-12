@@ -6,7 +6,18 @@ import yaml
 from collections import ChainMap
 import re
 import os
+from agents.td_agent import *
+from agents.q_agent import *
 
+def get_agent_type(config_file):
+    #hardcode for now but should come up with a more general solution
+    mapping = {
+        'TD.*': TDLambdaNN,
+        'DQN.*': DQNAgent
+    }
+    for regex, agent in mapping.items():
+        if re.search(regex, config_file):
+            return agent
 
 def load_config_file(agent, config_file, saved_agent_folder):
     with open(config_file, "r") as f:
@@ -44,6 +55,8 @@ def load_config_file(agent, config_file, saved_agent_folder):
                     checkpoint["optimizer_state"]
                 )
                 training_functions["loss_function"].load_state_dict(checkpoint["loss"])
+                if 'epsilon' in checkpoint:
+                    agent_params['epsilon'] = checkpoint['epsilon']
 
         return (
             agent(**agent_params, **training_functions),
