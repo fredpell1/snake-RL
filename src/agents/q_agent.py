@@ -19,6 +19,7 @@ class DQNAgent(BaseAgent):
         optimizer,
         loss_function,
         value_function,
+        n_steps = 0
     ) -> None:
         super().__init__(value_function, optimizer, loss_function)
         self.buffer_size = buffer_size
@@ -33,7 +34,7 @@ class DQNAgent(BaseAgent):
         self.policy_net = value_function
         self.target_net = copy.deepcopy(value_function)
         self.target_net.load_state_dict(self.policy_net.state_dict())
-        self.n_steps = 0
+        self.n_steps = n_steps
 
 
     def _save_transition(self, transition):
@@ -127,7 +128,8 @@ class DQNAgent(BaseAgent):
                 "value_function": self.value_function.state_dict(),
                 "optimizer_state": self.optimizer.state_dict(),
                 "loss": self.loss_function.state_dict(),
-                "epsilon": epsilon
+                "epsilon": epsilon,
+                "n_steps": self.n_steps
             },
             filename,
         )

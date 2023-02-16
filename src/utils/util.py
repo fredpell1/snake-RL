@@ -57,6 +57,8 @@ def load_config_file(agent, config_file, saved_agent_folder):
                 training_functions["loss_function"].load_state_dict(checkpoint["loss"])
                 if 'epsilon' in checkpoint:
                     agent_params['epsilon'] = checkpoint['epsilon']
+                if 'n_steps' in checkpoint:
+                    agent_params['n_steps'] = checkpoint['n_steps']
 
         return (
             agent(**agent_params, **training_functions),
