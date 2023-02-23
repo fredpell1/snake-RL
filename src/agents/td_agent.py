@@ -44,7 +44,6 @@ class TDLambdaNN(BaseAgent):
             else:
                 return self._pick_randomly(observation)
 
-   
     def update(self, reward, observation, action, terminated):
         # we voluntiraly don't zero grad the optimizer to have eligibility traces
         for parameter in self.value_function.parameters():

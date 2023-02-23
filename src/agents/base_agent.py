@@ -22,7 +22,6 @@ class BaseAgent(metaclass=ABCMeta):
         self.optimizer: torch.nn.Module = optimizer
         self.loss_function: torch.nn.Module = loss_function
 
-   
     @abstractmethod
     def reset(self):
         raise NotImplementedError("You should implement this method in a subclass")
@@ -89,7 +88,6 @@ class BaseAgent(metaclass=ABCMeta):
             },
             filename,
         )
-
 
     def _subset_actions(self, observation):
         head = observation["agent"]
