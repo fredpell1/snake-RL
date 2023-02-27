@@ -65,7 +65,7 @@ class DQNAgent(BaseAgent):
             (
                 self.prev_state,
                 torch.tensor([[action]]),
-                self._get_state_from_obs(observation),
+                self._get_state_from_obs(observation) if not terminated else None,
                 torch.tensor([reward]),
             )
         )
@@ -76,15 +76,21 @@ class DQNAgent(BaseAgent):
         batch = (*zip(*transitions),)
         state_batch = torch.cat(batch[0])
         action_batch = torch.cat(batch[1])
-        next_state_batch = torch.cat(batch[2])
+        #keeping non-terminal states
+        non_final_mask = torch.tensor(tuple(map(
+            lambda s: s is not None, batch[2]
+        )), dtype = torch.bool)
+        non_final_next_states = torch.cat([s for s in batch[2] if s is not None])
+        
         reward_batch = torch.cat(batch[3])
 
         # Q(s,a) for all s,a in (state_batch, action_batch)
         state_action_values = self.policy_net(state_batch).gather(1, action_batch)
 
-        # max Q(s',a') for all s',a' in (next_state_batch, action_batch)
+        next_state_values = torch.zeros(self.batch_size)
+        # max Q(s',a') for all s',a' in (next_state_batch, action_batch) if not a terminal state
         with torch.no_grad():
-            next_state_values = self.target_net(next_state_batch).max(1)[0]
+            next_state_values[non_final_mask] = self.target_net(non_final_next_states).max(1)[0]
         # compute target
 
         target = self.gamma * next_state_values + reward_batch
@@ -111,12 +117,13 @@ class DQNAgent(BaseAgent):
         head = observation["agent"]
         target = observation["target"]
         body = observation["body"]
-        vector = torch.full((100, 1), -1.0)
-        vector[10 * head[1] - 10 + head[0]] += 2
-        vector[10 * target[1] - 10 + target[0]] += 3
+        vector = torch.full((10, 10), -1.0)
+        vector[head[1], head[0]] += 2
+        vector[target[1],target[0]] += 3
         for part in body:
-            vector[10 * part[1] - 10 + part[0]] += 1
-        return vector.T
+            vector[part[1],part[0]] += 1
+        vector = vector.flatten()
+        return vector.unsqueeze(0)
 
     def eval(self):
         pass  # self.epsilon /= 100
