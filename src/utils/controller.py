@@ -50,9 +50,11 @@ def agent_mode(
     agent: BaseAgent,
     max_step: int = None,
     mode: str = "training",
+    verbose : bool = False
 ):
     max_step = max_step if max_step else sys.maxsize
     rewards = []
+    print(verbose)
     for _ in range(n_episodes):
         agent.reset()
         observation, info = env.reset()
@@ -61,6 +63,8 @@ def agent_mode(
             action = agent.select_action(observation)
             observation, reward, target, terminated, info = env.step(action)
             episode_reward += reward
+            if verbose:
+                print(reward)
             if target:
                 env.eat_apple()
             if mode == "training":

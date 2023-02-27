@@ -21,6 +21,7 @@ class DQNAgent(BaseAgent):
         loss_function,
         value_function,
         n_steps=0,
+        verbose = False
     ) -> None:
         super().__init__(value_function, optimizer, loss_function)
         self.buffer_size = buffer_size
@@ -36,6 +37,7 @@ class DQNAgent(BaseAgent):
         self.target_net = copy.deepcopy(value_function)
         self.target_net.load_state_dict(self.policy_net.state_dict())
         self.n_steps = n_steps
+        self.verbose = verbose
 
     def _save_transition(self, transition):
         self.buffer.append(transition)
@@ -123,6 +125,9 @@ class DQNAgent(BaseAgent):
         for part in body:
             vector[part[1],part[0]] += 1
         vector = vector.flatten()
+        if self.verbose:
+            print('head:', head)
+            print(torch.where(vector == 1))
         return vector.unsqueeze(0)
 
     def eval(self):

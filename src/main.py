@@ -3,6 +3,7 @@ from utils.util import *
 from agents import heuristic_agent, mc_agent, td_agent
 from argparse import ArgumentParser
 import yaml
+import sys
 
 
 def main(config_file, agent_folder, n_episodes, output_file, user, verbose):
@@ -10,9 +11,9 @@ def main(config_file, agent_folder, n_episodes, output_file, user, verbose):
         user_mode(verbose)
     else:
         agent = get_agent_type(config_file)
-        agent, file = load_config_file(agent, config_file, agent_folder)
-        train_and_save(agent, n_episodes, 500, file, output_file)
-        test(agent, 10, 50)
+        agent, file = load_config_file(agent, config_file, agent_folder, verbose)
+        train_and_save(agent, n_episodes, 500, file, output_file, verbose)
+        test(agent, 10, 20, verbose)
 
 
 if __name__ == "__main__":
@@ -23,12 +24,13 @@ if __name__ == "__main__":
     parser.add_argument("-o", "--output")
     parser.add_argument("-u", "--user", action='store_true')
     parser.add_argument("-v", "--verbose", action='store_true')
-    args = parser.parse_args()
+    args,unknown = parser.parse_known_args()
+    print(args)
     main(
-        config_file=args.config,
+        config_file=args.config.strip(),
         n_episodes=args.episodes,
-        agent_folder=args.folder,
-        output_file=args.output,
+        agent_folder=args.folder.strip(),
+        output_file=args.output.strip(),
         user=args.user,
         verbose=args.verbose
     )
