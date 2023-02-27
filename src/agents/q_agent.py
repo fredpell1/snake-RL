@@ -21,7 +21,8 @@ class DQNAgent(BaseAgent):
         loss_function,
         value_function,
         n_steps=0,
-        verbose = False
+        verbose = False,
+        buffer = None
     ) -> None:
         super().__init__(value_function, optimizer, loss_function)
         self.buffer_size = buffer_size
@@ -32,7 +33,7 @@ class DQNAgent(BaseAgent):
         self.tau = tau
         self.epsilon_min = epsilon_min
         self.epsilon_decay = epsilon_decay
-        self.buffer = deque([], maxlen=buffer_size)
+        self.buffer = deque([], maxlen=buffer_size) if not buffer else buffer 
         self.policy_net = value_function
         self.target_net = copy.deepcopy(value_function)
         self.target_net.load_state_dict(self.policy_net.state_dict())
@@ -144,6 +145,7 @@ class DQNAgent(BaseAgent):
                 "loss": self.loss_function.state_dict(),
                 "epsilon": epsilon,
                 "n_steps": self.n_steps,
+                "buffer": self.buffer
             },
             filename,
         )

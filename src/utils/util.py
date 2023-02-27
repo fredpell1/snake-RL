@@ -59,6 +59,8 @@ def load_config_file(agent, config_file, saved_agent_folder, verbose):
                     agent_params["epsilon"] = checkpoint["epsilon"]
                 if "n_steps" in checkpoint:
                     agent_params["n_steps"] = checkpoint["n_steps"]
+                if "buffer" in checkpoint:
+                    agent_params["buffer"] = checkpoint['buffer']
 
         return (
             agent(**agent_params, **training_functions),
