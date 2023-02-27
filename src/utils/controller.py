@@ -54,7 +54,6 @@ def agent_mode(
 ):
     max_step = max_step if max_step else sys.maxsize
     rewards = []
-    print(verbose)
     for _ in range(n_episodes):
         agent.reset()
         observation, info = env.reset()

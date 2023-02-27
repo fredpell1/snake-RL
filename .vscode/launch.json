@@ -11,7 +11,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": ["-c configs/DQN-V1.yaml", "-e  0",  "-f outputs" , "-o outputs/dqn-v1-test.txt", "-v"],
+            "args": ["-c configs/DQN-V1.yaml", "-e  0",  "-f saved_agent" , "-o outputs/dqn-v1-test.txt", "-v"],
             "purpose": ["debug-in-terminal"]
         }
     ]
