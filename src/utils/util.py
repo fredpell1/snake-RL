@@ -18,7 +18,7 @@ def get_agent_type(config_file):
             return agent
 
 
-def load_config_file(agent, config_file, saved_agent_folder):
+def load_config_file(agent, config_file, saved_agent_folder, verbose):
     with open(config_file, "r") as f:
         parameters = yaml.safe_load(f)
 
@@ -27,6 +27,7 @@ def load_config_file(agent, config_file, saved_agent_folder):
         network_params = parameters["network_params"]
         training_params = parameters["training_params"]
         value_function = torch.nn.Sequential()
+        agent_params["verbose"] = verbose
         for layer in network_params:
             layer_type = list(layer.keys())[0]
             if hasattr(torch.nn, layer_type):
@@ -58,6 +59,8 @@ def load_config_file(agent, config_file, saved_agent_folder):
                     agent_params["epsilon"] = checkpoint["epsilon"]
                 if "n_steps" in checkpoint:
                     agent_params["n_steps"] = checkpoint["n_steps"]
+                if "buffer" in checkpoint:
+                    agent_params["buffer"] = checkpoint["buffer"]
 
         return (
             agent(**agent_params, **training_functions),
@@ -68,19 +71,26 @@ def load_config_file(agent, config_file, saved_agent_folder):
         raise ValueError(f"{config_file} is invalid")
 
 
-def train_and_save(agent, n_episodes, max_step, filename, output_file):
+def train_and_save(agent, n_episodes, max_step, filename, output_file, verbose=False):
     env = envs.SnakeEnv(size=10)
     _, _ = env.reset()
-    rewards = agent_mode(env=env, n_episodes=n_episodes, agent=agent, max_step=max_step)
+    rewards = agent_mode(
+        env=env, n_episodes=n_episodes, agent=agent, max_step=max_step, verbose=verbose
+    )
     with open(output_file, "ab") as f:
         f.write(b"\n")
         np.savetxt(f, rewards)
     agent.save(filename)
 
 
-def test(agent, n_episodes, max_step):
+def test(agent, n_episodes, max_step, verbose):
     env = envs.SnakeEnv(render_mode="human", size=10)
     agent.eval()
     agent_mode(
-        env=env, n_episodes=n_episodes, agent=agent, max_step=max_step, mode="testing"
+        env=env,
+        n_episodes=n_episodes,
+        agent=agent,
+        max_step=max_step,
+        mode="testing",
+        verbose=verbose,
     )

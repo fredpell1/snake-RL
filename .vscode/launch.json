@@ -1,0 +1,18 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: Current File",
+            "type": "python",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": ["-c configs/DQN-V1.yaml", "-e  0",  "-f saved_agent" , "-o outputs/dqn-v1-test.txt", "-v"],
+            "purpose": ["debug-in-terminal"]
+        }
+    ]
+}

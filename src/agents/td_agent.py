@@ -25,6 +25,7 @@ class TDLambdaNN(BaseAgent):
         self.subset_actions = subset_actions
 
     def select_action(self, observation):
+        # broken, will fix later
         self.prev_state = self._get_state_from_obs(observation)
         with torch.no_grad():
             p = np.random.random()
@@ -49,9 +50,12 @@ class TDLambdaNN(BaseAgent):
         for parameter in self.value_function.parameters():
             if parameter.grad is not None:
                 parameter.grad *= self.gamma * self.lambda_
-
-        s_prime = self._get_state_from_obs(observation)
-        td_target = torch.tensor(reward) + self.gamma * self.value_function(s_prime)
+        s_prime = self._get_state_from_obs(observation) if not terminated else None
+        td_target = (
+            torch.tensor(reward) + self.gamma * self.value_function(s_prime)
+            if not terminated
+            else torch.zeros(1)
+        )
         loss = self.loss_function(self.value_function(self.prev_state), td_target)
         loss.backward()
         self.optimizer.step()
@@ -68,9 +72,10 @@ class TDLambdaNN(BaseAgent):
         head = observation["agent"]
         target = observation["target"]
         body = observation["body"]
-        vector = torch.full((100, 1), -1.0)
-        vector[10 * head[1] - 10 + head[0]] += 2
-        vector[10 * target[1] - 10 + target[0]] += 3
+        vector = torch.full((10, 10), -1.0)
+        vector[head[1], head[0]] += 2
+        vector[target[1], target[0]] += 3
         for part in body:
-            vector[10 * part[1] - 10 + part[0]] += 1
-        return vector.T
+            vector[part[1], part[0]] += 1
+        vector = vector.flatten()
+        return vector.unsqueeze(0)
