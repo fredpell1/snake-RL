@@ -23,7 +23,8 @@ class DQNAgent(BaseAgent):
         n_steps=0,
         verbose=False,
         buffer=None,
-        keep_target = False
+        keep_target = False,
+        negative_reward = False
     ) -> None:
         super().__init__(value_function, optimizer, loss_function)
         self.buffer_size = buffer_size
@@ -41,6 +42,7 @@ class DQNAgent(BaseAgent):
         self.n_steps = n_steps
         self.verbose = verbose
         self.keep_target = keep_target
+        self.negative_reward = negative_reward
 
     def _save_transition(self, transition):
         self.buffer.append(transition)
@@ -66,6 +68,9 @@ class DQNAgent(BaseAgent):
         return None
 
     def update(self, reward, observation, action, terminated):
+        #penalize not reaching the target
+        if reward == 0 and self.negative_reward:
+            reward = -0.01
         self.buffer.append(
             (
                 self.prev_state,
