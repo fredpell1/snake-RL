@@ -24,7 +24,8 @@ class DQNAgent(BaseAgent):
         verbose=False,
         buffer=None,
         keep_target = False,
-        negative_reward = False
+        negative_reward = False,
+        orthogonal_moves = True
     ) -> None:
         super().__init__(value_function, optimizer, loss_function)
         self.buffer_size = buffer_size
@@ -43,6 +44,9 @@ class DQNAgent(BaseAgent):
         self.verbose = verbose
         self.keep_target = keep_target
         self.negative_reward = negative_reward
+        self.orthogonal_moves = orthogonal_moves
+        if not self.orthogonal_moves:
+            self.prev_action = None
 
     def _save_transition(self, transition):
         self.buffer.append(transition)
@@ -58,11 +62,31 @@ class DQNAgent(BaseAgent):
             -1.0 * self.n_steps / self.epsilon_decay
         )
         self.n_steps += 1
+        action = None
         if epsilon < p:
             with torch.no_grad():
-                return int(self.policy_net(state).max(1)[1].view(1, 1).item())
+                action =  int(self.policy_net(state).max(1)[1].view(1, 1).item())
         else:
-            return self._pick_randomly(observation)
+            action =  self._pick_randomly(observation)
+        
+        if not self.orthogonal_moves:
+            if self._is_valid_action(action, observation):
+                self.prev_action = action
+                return action
+            else:
+                if self.prev_action:
+                    return self.prev_action
+                else: #first action
+                    self.prev_action = self._pick_randomly(observation)
+                    return self.prev_action
+        else:
+            return action
+        
+    def _is_valid_action(self,action, observation):
+        if action in self._subset_actions(observation):
+            return True
+        else:
+            return False
 
     def reset(self):
         return None
