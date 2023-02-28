@@ -27,7 +27,7 @@ def load_config_file(agent, config_file, saved_agent_folder, verbose):
         network_params = parameters["network_params"]
         training_params = parameters["training_params"]
         value_function = torch.nn.Sequential()
-        agent_params['verbose'] = verbose
+        agent_params["verbose"] = verbose
         for layer in network_params:
             layer_type = list(layer.keys())[0]
             if hasattr(torch.nn, layer_type):
@@ -60,7 +60,7 @@ def load_config_file(agent, config_file, saved_agent_folder, verbose):
                 if "n_steps" in checkpoint:
                     agent_params["n_steps"] = checkpoint["n_steps"]
                 if "buffer" in checkpoint:
-                    agent_params["buffer"] = checkpoint['buffer']
+                    agent_params["buffer"] = checkpoint["buffer"]
 
         return (
             agent(**agent_params, **training_functions),
@@ -74,16 +74,23 @@ def load_config_file(agent, config_file, saved_agent_folder, verbose):
 def train_and_save(agent, n_episodes, max_step, filename, output_file, verbose=False):
     env = envs.SnakeEnv(size=10)
     _, _ = env.reset()
-    rewards = agent_mode(env=env, n_episodes=n_episodes, agent=agent, max_step=max_step, verbose = verbose)
+    rewards = agent_mode(
+        env=env, n_episodes=n_episodes, agent=agent, max_step=max_step, verbose=verbose
+    )
     with open(output_file, "ab") as f:
         f.write(b"\n")
         np.savetxt(f, rewards)
     agent.save(filename)
 
 
-def test(agent, n_episodes, max_step,verbose):
+def test(agent, n_episodes, max_step, verbose):
     env = envs.SnakeEnv(render_mode="human", size=10)
     agent.eval()
     agent_mode(
-        env=env, n_episodes=n_episodes, agent=agent, max_step=max_step, mode="testing", verbose=verbose
+        env=env,
+        n_episodes=n_episodes,
+        agent=agent,
+        max_step=max_step,
+        mode="testing",
+        verbose=verbose,
     )

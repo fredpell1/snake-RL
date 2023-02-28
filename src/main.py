@@ -22,14 +22,14 @@ if __name__ == "__main__":
     parser.add_argument("-e", "--episodes", type=int)
     parser.add_argument("-f", "--folder", default="saved_agent")
     parser.add_argument("-o", "--output")
-    parser.add_argument("-u", "--user", action='store_true')
-    parser.add_argument("-v", "--verbose", action='store_true')
-    args,unknown = parser.parse_known_args()
+    parser.add_argument("-u", "--user", action="store_true")
+    parser.add_argument("-v", "--verbose", action="store_true")
+    args, unknown = parser.parse_known_args()
     main(
         config_file=args.config.strip(),
         n_episodes=args.episodes,
         agent_folder=args.folder.strip(),
         output_file=args.output.strip(),
         user=args.user,
-        verbose=args.verbose
+        verbose=args.verbose,
     )
