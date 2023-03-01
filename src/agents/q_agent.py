@@ -7,6 +7,7 @@ import random
 
 
 class DQNAgent(BaseAgent):
+    input_types = ['vector', 'grid']
     def __init__(
         self,
         buffer_size,
@@ -26,6 +27,7 @@ class DQNAgent(BaseAgent):
         keep_target=True,
         negative_reward=False,
         orthogonal_moves=True,
+        input_type = 'vector'
     ) -> None:
         super().__init__(value_function, optimizer, loss_function)
         self.buffer_size = buffer_size
@@ -47,6 +49,9 @@ class DQNAgent(BaseAgent):
         self.orthogonal_moves = orthogonal_moves
         if not self.orthogonal_moves:
             self.prev_action = None
+        
+        assert input_type in self.input_types
+        self.input_type = input_type
 
     def _save_transition(self, transition):
         self.buffer.append(transition)
@@ -150,25 +155,33 @@ class DQNAgent(BaseAgent):
         self.target_net.load_state_dict(target_net_state_dict)
 
     def _get_state_from_obs(self, observation):
-        head = observation["agent"]
-        target = observation["target"]
-        body = observation["body"]
-        vector = torch.full((10, 10), -1.0)
-        vector[head[1], head[0]] += 2
-
-        if np.all(head == target):
-            if self.keep_target:
-                vector[target[1], target[0]] += 3
-        else:
-            vector[target[1], target[0]] += 3
-
-        for part in body:
-            vector[part[1], part[0]] += 1
-        vector = vector.flatten()
+        head, grid = self._build_grid(observation)
+        vector = grid.flatten()
         if self.verbose:
             print("head:", head)
             print(torch.where(vector == 1))
-        return vector.unsqueeze(0)
+        if self.input_type == 'vector':
+            return vector.unsqueeze(0)
+        if self.input_type == 'grid':
+            return grid.unsqueeze(0)
+        
+    def _build_grid(self, observation):
+        head = observation["agent"]
+        target = observation["target"]
+        body = observation["body"]
+        grid = torch.full((10, 10), -1.0)
+        grid[head[1], head[0]] += 2
+
+        if np.all(head == target):
+            if self.keep_target:
+                grid[target[1], target[0]] += 3
+        else:
+            grid[target[1], target[0]] += 3
+
+        for part in body:
+            grid[part[1], part[0]] += 1
+        
+        return head,grid
 
     def eval(self):
         pass  # self.epsilon /= 100
