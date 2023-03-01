@@ -70,6 +70,8 @@ class DQNAgent(BaseAgent):
         action = None
         if epsilon < p:
             with torch.no_grad():
+                if self.input_type == 'grid':
+                    state = state.unsqueeze(0)
                 action = int(self.policy_net(state).max(1)[1].view(1, 1).item())
         else:
             action = self._pick_randomly(observation)
@@ -122,7 +124,9 @@ class DQNAgent(BaseAgent):
         non_final_next_states = torch.cat([s for s in batch[2] if s is not None])
 
         reward_batch = torch.cat(batch[3])
-
+        if self.input_type == 'grid':
+            state_batch = state_batch.unsqueeze(0).transpose(0,1)
+            non_final_next_states = non_final_next_states.unsqueeze(0).transpose(0,1)
         # Q(s,a) for all s,a in (state_batch, action_batch)
         state_action_values = self.policy_net(state_batch).gather(1, action_batch)
 
