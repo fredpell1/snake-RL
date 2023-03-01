@@ -23,9 +23,9 @@ class DQNAgent(BaseAgent):
         n_steps=0,
         verbose=False,
         buffer=None,
-        keep_target = True,
-        negative_reward = False,
-        orthogonal_moves = True
+        keep_target=True,
+        negative_reward=False,
+        orthogonal_moves=True,
     ) -> None:
         super().__init__(value_function, optimizer, loss_function)
         self.buffer_size = buffer_size
@@ -65,10 +65,10 @@ class DQNAgent(BaseAgent):
         action = None
         if epsilon < p:
             with torch.no_grad():
-                action =  int(self.policy_net(state).max(1)[1].view(1, 1).item())
+                action = int(self.policy_net(state).max(1)[1].view(1, 1).item())
         else:
-            action =  self._pick_randomly(observation)
-        
+            action = self._pick_randomly(observation)
+
         if not self.orthogonal_moves:
             if self._is_valid_action(action, observation):
                 self.prev_action = action
@@ -76,13 +76,13 @@ class DQNAgent(BaseAgent):
             else:
                 if self.prev_action:
                     return self.prev_action
-                else: #first action
+                else:  # first action
                     self.prev_action = self._pick_randomly(observation)
                     return self.prev_action
         else:
             return action
-        
-    def _is_valid_action(self,action, observation):
+
+    def _is_valid_action(self, action, observation):
         if action in self._subset_actions(observation):
             return True
         else:
@@ -92,7 +92,7 @@ class DQNAgent(BaseAgent):
         return None
 
     def update(self, reward, observation, action, terminated):
-        #penalize not reaching the target
+        # penalize not reaching the target
         if reward == 0 and self.negative_reward:
             reward = -0.01
         self.buffer.append(
@@ -161,7 +161,7 @@ class DQNAgent(BaseAgent):
                 vector[target[1], target[0]] += 3
         else:
             vector[target[1], target[0]] += 3
-        
+
         for part in body:
             vector[part[1], part[0]] += 1
         vector = vector.flatten()
