@@ -23,7 +23,7 @@ class DQNAgent(BaseAgent):
         n_steps=0,
         verbose=False,
         buffer=None,
-        keep_target = False,
+        keep_target = True,
         negative_reward = False,
         orthogonal_moves = True
     ) -> None:
