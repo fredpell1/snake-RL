@@ -89,7 +89,7 @@ class DQNAgent(BaseAgent):
             return False
 
     def reset(self):
-        return None
+        self.prev_action = None
 
     def update(self, reward, observation, action, terminated):
         # penalize not reaching the target
