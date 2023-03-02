@@ -64,7 +64,7 @@ class SnakeEnv(gym.Env):
 
         # Choose the agent's head location uniformly at random
         self._head_location = self.np_random.integers(
-            1, self.size - 2, size=2, dtype=int
+            2, self.size - 2, size=2, dtype=int
         )
 
         # Set the initial body location
@@ -77,7 +77,8 @@ class SnakeEnv(gym.Env):
         # We will sample the target's location randomly until it does not coincide with the agent's location
         # TODO: add check to make sure target does not overlap with body
         self._target_location = self._head_location
-        while np.array_equal(self._target_location, self._head_location):
+        while np.array_equal(self._target_location, self._head_location) and \
+            np.any(self._body_location == self._target_location):
             self._target_location = self.np_random.integers(
                 0, self.size, size=2, dtype=int
             )
@@ -85,8 +86,9 @@ class SnakeEnv(gym.Env):
         observation = self._get_obs()
         info = self._get_info()
 
-        if self.render_mode == "human":
-            self._render_frame()
+        if self.render_mode == "human" or self.render_mode == "rgb_array":
+            pixels = self._render_frame()
+            return observation,info, pixels
 
         return observation, info
 
@@ -119,13 +121,15 @@ class SnakeEnv(gym.Env):
         info = self._get_info()
 
         if self.render_mode == "human" or self.render_mode == "rgb_array":
-            self._render_frame()
+            pixels = self._render_frame()
+            return observation, reward, target, terminated, info, pixels
 
         return observation, reward, target, terminated, info
 
     def eat_apple(self):
         # spawn apple randomly
-        while np.array_equal(self._target_location, self._head_location):
+        while np.array_equal(self._target_location, self._head_location) and \
+            np.any(self._body_location == self._target_location):
             self._target_location = self.np_random.integers(
                 0, self.size, size=2, dtype=int
             )
