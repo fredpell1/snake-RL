@@ -77,8 +77,9 @@ class SnakeEnv(gym.Env):
         # We will sample the target's location randomly until it does not coincide with the agent's location
         # TODO: add check to make sure target does not overlap with body
         self._target_location = self._head_location
-        while np.array_equal(self._target_location, self._head_location) and \
-            np.any(self._body_location == self._target_location):
+        while np.array_equal(self._target_location, self._head_location) or \
+            any(np.array_equal(self._target_location,x) for x in self._body_location):
+            
             self._target_location = self.np_random.integers(
                 0, self.size, size=2, dtype=int
             )
@@ -128,8 +129,8 @@ class SnakeEnv(gym.Env):
 
     def eat_apple(self):
         # spawn apple randomly
-        while np.array_equal(self._target_location, self._head_location) and \
-            np.any(self._body_location == self._target_location):
+        while np.array_equal(self._target_location, self._head_location) or \
+            any(np.array_equal(self._target_location,x) for x in self._body_location):
             self._target_location = self.np_random.integers(
                 0, self.size, size=2, dtype=int
             )

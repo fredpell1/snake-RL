@@ -43,7 +43,7 @@ def load_config_file(agent, config_file, saved_agent_folder, verbose):
                     params=value_function.parameters(), **dict(ChainMap(*value))
                 )
         training_functions["value_function"] = value_function
-        version = re.search(r"\/(?P<version>.*)\.yaml", config_file)
+        version = re.search(r".*\/(?P<version>.*)\.yaml", config_file)
         if version:
             version = version.group("version")
             if version in os.listdir(saved_agent_folder):

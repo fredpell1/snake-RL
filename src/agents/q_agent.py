@@ -174,8 +174,8 @@ class DQNAgent(BaseAgent):
         target = observation["target"]
         body = observation["body"]
         grid = torch.full((10, 10), -1.0)
-        grid[head[1], head[0]] += 2
-
+        
+        grid[head[1], head[0]] += 2 if not any(np.array_equal(head , x) for x in body) else 0
         if np.all(head == target):
             if self.keep_target:
                 grid[target[1], target[0]] += 3

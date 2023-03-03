@@ -1,20 +1,20 @@
 agent_params:
   buffer_size: 10000
   batch_size: 128
-  epsilon: 0.1
+  epsilon: 0.30
   gamma: 0.99
   learning_rate: 0.0001
   tau: 0.005
   epsilon_min : 0.05
-  epsilon_decay : 1000
+  epsilon_decay : 2000
   input_type : "grid"
 network_params:
-  - Conv2d : [1,16,8,4,1]
+  - Conv2d : [1,32,2,1]
   - ReLU : []
-  - Conv2d : [16,32,4,2,1]
+  - Conv2d : [32,64,4,2]
   - ReLU : []
-  - Flatten : []
-  - LazyLinear : [512]
+  - Flatten : [1,-1]
+  - Linear : [576,512]
   - ReLU : []
   - Linear : [512,4]
 training_params:

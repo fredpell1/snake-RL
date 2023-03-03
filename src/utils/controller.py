@@ -57,11 +57,18 @@ def agent_mode(
     rewards = []
     for _ in range(n_episodes):
         agent.reset()
-        observation, info = env.reset()
+        if env.render_mode == None:
+            observation, info = env.reset()
+        else:
+            observation,info, pixels = env.reset()
         episode_reward = 0
         for i in range(max_step):
             action = agent.select_action(observation)
-            observation, reward, target, terminated, info = env.step(action)
+            if env.render_mode == None:
+                observation, reward, target, terminated, info = env.step(action)
+            else:
+                observation, reward, target, terminated, info, pixels = env.step(action)
+            
             episode_reward += reward
             if verbose:
                 print(reward)
