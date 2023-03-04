@@ -12,7 +12,7 @@ def main(config_file, agent_folder, n_episodes, output_file, user, verbose):
     else:
         agent = get_agent_type(config_file)
         agent, file = load_config_file(agent, config_file, agent_folder, verbose)
-        train_and_save(agent, n_episodes, 500, file, output_file, verbose)
+        train_and_save(agent, n_episodes, 400, file, output_file, verbose)
         test(agent, 10, 50, verbose)
 
 
