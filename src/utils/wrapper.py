@@ -22,3 +22,9 @@ class MultiFrame():
         output = self.env.step(action)
         self.frames.append(output[0])
         return self.frames , *output[1:]
+
+    def eat_apple(self):
+        return self.env.eat_apple()
+    
+    def close(self):
+        return self.env.close()

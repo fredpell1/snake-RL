@@ -1,5 +1,6 @@
 import torch
 from utils.controller import agent_mode
+from utils.wrapper import MultiFrame
 import envs
 import numpy as np
 import yaml
@@ -73,7 +74,9 @@ def load_config_file(agent, config_file, saved_agent_folder, verbose):
 
 def train_and_save(agent, n_episodes, max_step, filename, output_file, verbose=False):
     env = envs.SnakeEnv(size=10)
-    _, _ = env.reset()
+    if agent.input_type == 'multiframe':
+        env = MultiFrame(env, agent.n_frames)
+    _ = env.reset()
     rewards = agent_mode(
         env=env, n_episodes=n_episodes, agent=agent, max_step=max_step, verbose=verbose
     )
@@ -85,6 +88,8 @@ def train_and_save(agent, n_episodes, max_step, filename, output_file, verbose=F
 
 def test(agent, n_episodes, max_step, verbose):
     env = envs.SnakeEnv(render_mode="human", size=10)
+    if agent.input_type == 'multiframe':
+        env = MultiFrame(env, agent.n_frames)
     agent.eval()
     agent_mode(
         env=env,

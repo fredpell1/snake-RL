@@ -7,7 +7,7 @@ import random
 
 
 class DQNAgent(BaseAgent):
-    input_types = ['vector', 'grid']
+    input_types = ['vector', 'grid', 'multiframe']
     def __init__(
         self,
         buffer_size,
@@ -27,7 +27,8 @@ class DQNAgent(BaseAgent):
         keep_target=True,
         negative_reward=False,
         orthogonal_moves=True,
-        input_type = 'vector'
+        input_type = 'vector',
+        n_frames = None
     ) -> None:
         super().__init__(value_function, optimizer, loss_function)
         self.buffer_size = buffer_size
@@ -52,6 +53,7 @@ class DQNAgent(BaseAgent):
         
         assert input_type in self.input_types
         self.input_type = input_type
+        self.n_frames = n_frames
 
     def _save_transition(self, transition):
         self.buffer.append(transition)
@@ -74,17 +76,17 @@ class DQNAgent(BaseAgent):
                     state = state.unsqueeze(0)
                 action = int(self.policy_net(state).max(1)[1].view(1, 1).item())
         else:
-            action = self._pick_randomly(observation)
-
+            obs = observation if isinstance(observation,dict) else observation[-1] #set to last frame if multiframe
+            action = self._pick_randomly(obs)
         if not self.orthogonal_moves:
-            if self._is_valid_action(action, observation):
+            if self._is_valid_action(action, obs):
                 self.prev_action = action
                 return action
             else:
                 if self.prev_action:
                     return self.prev_action
                 else:  # first action
-                    self.prev_action = self._pick_randomly(observation)
+                    self.prev_action = self._pick_randomly(obs)
                     return self.prev_action
         else:
             return action
@@ -124,7 +126,7 @@ class DQNAgent(BaseAgent):
         non_final_next_states = torch.cat([s for s in batch[2] if s is not None])
 
         reward_batch = torch.cat(batch[3])
-        if self.input_type == 'grid':
+        if self.input_type == 'grid' :#no need to unsqueeze for multiframe since concat adds a dimension
             state_batch = state_batch.unsqueeze(0).transpose(0,1)
             non_final_next_states = non_final_next_states.unsqueeze(0).transpose(0,1)
         # Q(s,a) for all s,a in (state_batch, action_batch)
@@ -147,7 +149,6 @@ class DQNAgent(BaseAgent):
         loss.backward()
         torch.nn.utils.clip_grad.clip_grad_value_(self.policy_net.parameters(), 100)
         self.optimizer.step()
-
         # update target net weights
         target_net_state_dict = self.target_net.state_dict()
         policy_net_state_dict = self.policy_net.state_dict()
@@ -159,15 +160,20 @@ class DQNAgent(BaseAgent):
         self.target_net.load_state_dict(target_net_state_dict)
 
     def _get_state_from_obs(self, observation):
-        head, grid = self._build_grid(observation)
+        head, grid = self._build_grid(observation) if self.input_type != 'multiframe' else self.concat_frames(observation)
         vector = grid.flatten()
         if self.verbose:
             print("head:", head)
             print(torch.where(vector == 1))
         if self.input_type == 'vector':
             return vector.unsqueeze(0)
-        if self.input_type == 'grid':
+        if self.input_type == 'grid' or self.input_type == 'multiframe':
             return grid.unsqueeze(0)
+        
+    def concat_frames(self, observation):
+        grids = torch.stack([self._build_grid(ob)[1] for ob in observation])
+        head = self._build_grid(observation[-1])[0]
+        return head, grids
         
     def _build_grid(self, observation):
         head = observation["agent"]
