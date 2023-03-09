@@ -9,9 +9,9 @@ class MultiFrame():
         self.n_frames = n_frames
         self.frames = deque(maxlen=n_frames)
 
-    def reset(self):
+    def reset(self, **kwargs):
         self.frames.clear()
-        output = self.env.reset()
+        output = self.env.reset(**kwargs)
         #append copies of the first state
         for _ in range(self.n_frames):
             self.frames.append(copy.deepcopy(output[0]))

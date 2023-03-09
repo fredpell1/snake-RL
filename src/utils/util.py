@@ -78,7 +78,7 @@ def train_and_save(agent, n_episodes, max_step, filename, output_file, verbose=F
         env = MultiFrame(env, agent.n_frames)
     _ = env.reset()
     rewards,losses = agent_mode(
-        env=env, n_episodes=n_episodes, agent=agent, max_step=max_step, verbose=verbose
+        env=env, n_episodes=n_episodes, agent=agent, max_step=max_step, verbose=verbose, fixed_start=agent.fixed_start
     )
     agent.save(filename)
     with open(output_file, "ab") as f:
@@ -100,5 +100,5 @@ def test(agent, n_episodes, max_step, verbose):
         agent=agent,
         max_step=max_step,
         mode="testing",
-        verbose=verbose,
+        verbose=verbose
     )

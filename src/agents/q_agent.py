@@ -28,7 +28,8 @@ class DQNAgent(BaseAgent):
         negative_reward=False,
         orthogonal_moves=True,
         input_type = 'vector',
-        n_frames = None
+        n_frames = None,
+        fixed_start = False
     ) -> None:
         super().__init__(value_function, optimizer, loss_function)
         self.buffer_size = buffer_size
@@ -54,7 +55,7 @@ class DQNAgent(BaseAgent):
         assert input_type in self.input_types
         self.input_type = input_type
         self.n_frames = n_frames
-
+        self.fixed_start = fixed_start
         self.losses = []
 
     def _save_transition(self, transition):
