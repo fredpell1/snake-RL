@@ -27,7 +27,7 @@ def user_mode(verbose: bool):
                     move = 3
                 elif event.key == pygame.K_DOWN:
                     move = 1
-        observation, reward, target, terminated, info = env.step(move)
+        observation, reward, target, terminated, info, pixels = env.step(move)
         if verbose:
             print(observation, reward)
             head = observation["agent"]
@@ -80,4 +80,4 @@ def agent_mode(
                 break
         rewards.append(episode_reward)
     env.close()
-    return rewards
+    return rewards, agent.losses

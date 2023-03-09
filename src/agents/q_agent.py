@@ -55,6 +55,8 @@ class DQNAgent(BaseAgent):
         self.input_type = input_type
         self.n_frames = n_frames
 
+        self.losses = []
+
     def _save_transition(self, transition):
         self.buffer.append(transition)
 
@@ -143,7 +145,7 @@ class DQNAgent(BaseAgent):
         target = self.gamma * next_state_values + reward_batch
         # compute loss
         loss = self.loss_function(state_action_values, target.unsqueeze(1))
-
+        self.losses.append(loss.item())
         # optimize and gradient clipping
         self.optimizer.zero_grad()
         loss.backward()
@@ -172,7 +174,7 @@ class DQNAgent(BaseAgent):
         
     def concat_frames(self, observation):
         grids = torch.stack([self._build_grid(ob)[1] for ob in observation])
-        head = self._build_grid(observation[-1])[0]
+        head = observation[-1]['agent']
         return head, grids
         
     def _build_grid(self, observation):
@@ -190,7 +192,6 @@ class DQNAgent(BaseAgent):
 
         for part in body:
             grid[part[1], part[0]] += 1
-        
         return head,grid
 
     def eval(self):

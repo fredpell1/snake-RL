@@ -77,13 +77,16 @@ def train_and_save(agent, n_episodes, max_step, filename, output_file, verbose=F
     if agent.input_type == 'multiframe':
         env = MultiFrame(env, agent.n_frames)
     _ = env.reset()
-    rewards = agent_mode(
+    rewards,losses = agent_mode(
         env=env, n_episodes=n_episodes, agent=agent, max_step=max_step, verbose=verbose
     )
+    agent.save(filename)
     with open(output_file, "ab") as f:
         f.write(b"\n")
         np.savetxt(f, rewards)
-    agent.save(filename)
+    with open(f'losses/dqn-cnn-v2.txt', "ab") as f:
+        f.write(b"\n")
+        np.savetxt(f,losses)
 
 
 def test(agent, n_episodes, max_step, verbose):

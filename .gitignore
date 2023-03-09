@@ -132,3 +132,4 @@ dmypy.json
 #Models
 saved_agent/*
 outputs/
+losses/
