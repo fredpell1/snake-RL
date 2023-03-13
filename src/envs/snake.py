@@ -58,13 +58,35 @@ class SnakeEnv(gym.Env):
             )
         }
 
-    def reset(self, seed=None, options=None):
+    def reset(self, seed=None, options=None, fixed_start=False):
         # We need the following line to seed self.np_random
         super().reset(seed=seed)
 
-        # Choose the agent's head location uniformly at random
+        if fixed_start:
+            self._head_location = np.array([5, 5])
+            self._body_location = np.array([[5, 6], [5, 7]])
+            self._target_location = np.array([7, 6])
+        else:
+            # Choose the agent's head location uniformly at random
+            self.init_agent()
+
+            # We will sample the target's location randomly until it does not coincide with the agent's location
+
+            self.spawn_target_random()
+
+        observation = self._get_obs()
+        info = self._get_info()
+
+        if self.render_mode == "human" or self.render_mode == "rgb_array":
+            pixels = self._render_frame()
+            return observation, info, pixels
+
+        return observation, info
+
+    def init_agent(self):
+        """Initializes agent's location randomly"""
         self._head_location = self.np_random.integers(
-            1, self.size - 2, size=2, dtype=int
+            2, self.size - 2, size=2, dtype=int
         )
 
         # Set the initial body location
@@ -74,21 +96,15 @@ class SnakeEnv(gym.Env):
         else:
             self._body_location = np.array([[x, y - 1], [x, y - 2]])
 
-        # We will sample the target's location randomly until it does not coincide with the agent's location
-        # TODO: add check to make sure target does not overlap with body
+    def spawn_target_random(self):
+        """Relocates the target randomly"""
         self._target_location = self._head_location
-        while np.array_equal(self._target_location, self._head_location):
+        while np.array_equal(self._target_location, self._head_location) or any(
+            np.array_equal(self._target_location, x) for x in self._body_location
+        ):
             self._target_location = self.np_random.integers(
                 0, self.size, size=2, dtype=int
             )
-
-        observation = self._get_obs()
-        info = self._get_info()
-
-        if self.render_mode == "human":
-            self._render_frame()
-
-        return observation, info
 
     def step(self, action):
         # Map the action (element of {0,1,2,3}) to the direction we walk in
@@ -119,16 +135,14 @@ class SnakeEnv(gym.Env):
         info = self._get_info()
 
         if self.render_mode == "human" or self.render_mode == "rgb_array":
-            self._render_frame()
+            pixels = self._render_frame()
+            return observation, reward, target, terminated, info, pixels
 
         return observation, reward, target, terminated, info
 
     def eat_apple(self):
         # spawn apple randomly
-        while np.array_equal(self._target_location, self._head_location):
-            self._target_location = self.np_random.integers(
-                0, self.size, size=2, dtype=int
-            )
+        self.spawn_target_random()
         # grow body
         x_head, y_head = self._head_location[0], self._head_location[1]
         x_last, y_last = self._body_location[-1, 0], self._body_location[-1, 1]

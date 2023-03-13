@@ -27,7 +27,7 @@ def user_mode(verbose: bool):
                     move = 3
                 elif event.key == pygame.K_DOWN:
                     move = 1
-        observation, reward, target, terminated, info = env.step(move)
+        observation, reward, target, terminated, info, pixels = env.step(move)
         if verbose:
             print(observation, reward)
             head = observation["agent"]
@@ -52,16 +52,24 @@ def agent_mode(
     max_step: int = None,
     mode: str = "training",
     verbose: bool = False,
+    fixed_start: bool = False,
 ):
     max_step = max_step if max_step else sys.maxsize
     rewards = []
     for _ in range(n_episodes):
         agent.reset()
-        observation, info = env.reset()
+        if env.render_mode == None:
+            observation, info = env.reset(fixed_start=fixed_start)
+        else:
+            observation, info, pixels = env.reset(fixed_start=fixed_start)
         episode_reward = 0
         for i in range(max_step):
             action = agent.select_action(observation)
-            observation, reward, target, terminated, info = env.step(action)
+            if env.render_mode == None:
+                observation, reward, target, terminated, info = env.step(action)
+            else:
+                observation, reward, target, terminated, info, pixels = env.step(action)
+
             episode_reward += reward
             if verbose:
                 print(reward)
@@ -73,4 +81,4 @@ def agent_mode(
                 break
         rewards.append(episode_reward)
     env.close()
-    return rewards
+    return rewards, agent.losses

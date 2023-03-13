@@ -1,0 +1,22 @@
+agent_params:
+  buffer_size: 10000
+  batch_size: 128
+  epsilon: 0.30
+  gamma: 0.99
+  learning_rate: 0.0001
+  tau: 0.005
+  epsilon_min : 0.05
+  epsilon_decay : 2000
+  input_type : "grid"
+network_params:
+  - Conv2d : [1,32,2,1]
+  - ReLU : []
+  - Conv2d : [32,64,4,2]
+  - ReLU : []
+  - Flatten : [1,-1]
+  - Linear : [576,512]
+  - ReLU : []
+  - Linear : [512,4]
+training_params:
+  HuberLoss : []
+  AdamW : [lr: 0.0001, amsgrad: True]
