@@ -196,7 +196,8 @@ class DQNAgent(BaseAgent):
         return head,grid
 
     def eval(self):
-        pass  # self.epsilon /= 100
+        self.epsilon = 0
+        self.epsilon_min = 0
 
     def save(self, filename):
         epsilon = self.epsilon_min + (self.epsilon - self.epsilon_min) * np.exp(
