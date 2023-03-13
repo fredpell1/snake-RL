@@ -27,7 +27,9 @@ def get_agent_type(config_file: str) -> BaseAgent:
             return agent
 
 
-def load_config_file(agent: BaseAgent, config_file: str, saved_agent_folder: str, verbose: bool) -> tuple:
+def load_config_file(
+    agent: BaseAgent, config_file: str, saved_agent_folder: str, verbose: bool
+) -> tuple:
     """Load config file and build agent at runtime
 
     Args:
@@ -51,15 +53,17 @@ def load_config_file(agent: BaseAgent, config_file: str, saved_agent_folder: str
         training_params = parameters["training_params"]
         value_function = build_value_function(network_params)
         training_functions = build_training_functions(training_params, value_function)
-        
+
         version = get_model_version(config_file)
 
         if version in os.listdir(saved_agent_folder):
-            load_existing_model(saved_agent_folder, agent_params, training_functions, version)
+            load_existing_model(
+                saved_agent_folder, agent_params, training_functions, version
+            )
 
-        #add misc params
+        # add misc params
         agent_params["verbose"] = verbose
-        
+
         return (
             agent(**agent_params, **training_functions),
             f"{saved_agent_folder}/{version}",
@@ -68,7 +72,10 @@ def load_config_file(agent: BaseAgent, config_file: str, saved_agent_folder: str
     except KeyError:
         raise ValueError(f"{config_file} is invalid")
 
-def load_existing_model(saved_agent_folder: str, agent_params: dict, training_functions: dict, version: str):
+
+def load_existing_model(
+    saved_agent_folder: str, agent_params: dict, training_functions: dict, version: str
+):
     """Load parameters of existing model
 
     Args:
@@ -78,17 +85,13 @@ def load_existing_model(saved_agent_folder: str, agent_params: dict, training_fu
         version (str): Model's version
     """
     checkpoint = torch.load(f"{saved_agent_folder}/{version}")
-    
-    #loading core parts
-    training_functions["value_function"].load_state_dict(
-                checkpoint["value_function"]
-            )
-    training_functions["optimizer"].load_state_dict(
-                checkpoint["optimizer_state"]
-            )
+
+    # loading core parts
+    training_functions["value_function"].load_state_dict(checkpoint["value_function"])
+    training_functions["optimizer"].load_state_dict(checkpoint["optimizer_state"])
     training_functions["loss_function"].load_state_dict(checkpoint["loss"])
 
-    #loading misc parameters for specificities of some models
+    # loading misc parameters for specificities of some models
     if "epsilon" in checkpoint:
         agent_params["epsilon"] = checkpoint["epsilon"]
     if "n_steps" in checkpoint:
@@ -96,7 +99,10 @@ def load_existing_model(saved_agent_folder: str, agent_params: dict, training_fu
     if "buffer" in checkpoint:
         agent_params["buffer"] = checkpoint["buffer"]
 
-def build_training_functions(training_params: dict, value_function: torch.nn.Module) -> dict:
+
+def build_training_functions(
+    training_params: dict, value_function: torch.nn.Module
+) -> dict:
     """Build the optimizer and the loss function
 
     Args:
@@ -112,10 +118,11 @@ def build_training_functions(training_params: dict, value_function: torch.nn.Mod
             training_functions["loss_function"] = getattr(torch.nn, param)(*value)
         elif hasattr(torch.optim, param):
             training_functions["optimizer"] = getattr(torch.optim, param)(
-                    params=value_function.parameters(), **dict(ChainMap(*value))
-                )
+                params=value_function.parameters(), **dict(ChainMap(*value))
+            )
     training_functions["value_function"] = value_function
     return training_functions
+
 
 def build_value_function(network_params: list[dict]) -> torch.nn.Module:
     """Build the Neural Network layer by layer
@@ -131,7 +138,9 @@ def build_value_function(network_params: list[dict]) -> torch.nn.Module:
     """
     value_function = torch.nn.Sequential()
     for layer in network_params:
-        layer_type = list(layer.keys())[0] #converting to list because dicts don't support indexing
+        layer_type = list(layer.keys())[
+            0
+        ]  # converting to list because dicts don't support indexing
         if hasattr(torch.nn, layer_type):
             value_function.append(getattr(torch.nn, layer_type)(*layer[layer_type]))
         else:
@@ -151,15 +160,22 @@ def get_model_version(config_file: str) -> str:
     Returns:
         str: Model's version
     """
-    version = re.search(r".*\/(?P<version>.*)\.yaml", config_file)    
+    version = re.search(r".*\/(?P<version>.*)\.yaml", config_file)
     if version:
         version = version.group("version")
     else:
-        raise ValueError('Invalid file format')
+        raise ValueError("Invalid file format")
     return version
 
 
-def train_and_save(agent: BaseAgent, n_episodes: int, max_step: int, filename: str, output_file: str, verbose: bool =False):
+def train_and_save(
+    agent: BaseAgent,
+    n_episodes: int,
+    max_step: int,
+    filename: str,
+    output_file: str,
+    verbose: bool = False,
+):
     """Train the agent and saves its parameters
 
     Args:
@@ -171,19 +187,24 @@ def train_and_save(agent: BaseAgent, n_episodes: int, max_step: int, filename: s
         verbose (bool, optional): Print more information. Defaults to False.
     """
     env = envs.SnakeEnv(size=10)
-    if agent.input_type == 'multiframe':
+    if agent.input_type == "multiframe":
         env = MultiFrame(env, agent.n_frames)
     _ = env.reset()
-    rewards,losses = agent_mode(
-        env=env, n_episodes=n_episodes, agent=agent, max_step=max_step, verbose=verbose, fixed_start=agent.fixed_start
+    rewards, losses = agent_mode(
+        env=env,
+        n_episodes=n_episodes,
+        agent=agent,
+        max_step=max_step,
+        verbose=verbose,
+        fixed_start=agent.fixed_start,
     )
     agent.save(filename)
     with open(output_file, "ab") as f:
         f.write(b"\n")
         np.savetxt(f, rewards)
-    with open(f'losses/dqn-cnn-v2.txt', "ab") as f:
+    with open(f"losses/dqn-cnn-v2.txt", "ab") as f:
         f.write(b"\n")
-        np.savetxt(f,losses)
+        np.savetxt(f, losses)
 
 
 def test(agent: BaseAgent, n_episodes: int, max_step: int, verbose: bool = False):
@@ -196,7 +217,7 @@ def test(agent: BaseAgent, n_episodes: int, max_step: int, verbose: bool = False
         verbose (bool, optional): Prints more information. Defaults to False.
     """
     env = envs.SnakeEnv(render_mode="human", size=10)
-    if agent.input_type == 'multiframe':
+    if agent.input_type == "multiframe":
         env = MultiFrame(env, agent.n_frames)
     agent.eval()
     agent_mode(
@@ -205,5 +226,5 @@ def test(agent: BaseAgent, n_episodes: int, max_step: int, verbose: bool = False
         agent=agent,
         max_step=max_step,
         mode="testing",
-        verbose=verbose
+        verbose=verbose,
     )

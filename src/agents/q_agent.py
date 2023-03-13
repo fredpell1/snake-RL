@@ -7,7 +7,8 @@ import random
 
 
 class DQNAgent(BaseAgent):
-    input_types = ['vector', 'grid', 'multiframe']
+    input_types = ["vector", "grid", "multiframe"]
+
     def __init__(
         self,
         buffer_size,
@@ -27,9 +28,9 @@ class DQNAgent(BaseAgent):
         keep_target=True,
         negative_reward=False,
         orthogonal_moves=True,
-        input_type = 'vector',
-        n_frames = None,
-        fixed_start = False
+        input_type="vector",
+        n_frames=None,
+        fixed_start=False,
     ) -> None:
         super().__init__(value_function, optimizer, loss_function)
         self.buffer_size = buffer_size
@@ -51,7 +52,7 @@ class DQNAgent(BaseAgent):
         self.orthogonal_moves = orthogonal_moves
         if not self.orthogonal_moves:
             self.prev_action = None
-        
+
         assert input_type in self.input_types
         self.input_type = input_type
         self.n_frames = n_frames
@@ -75,11 +76,13 @@ class DQNAgent(BaseAgent):
         action = None
         if epsilon < p:
             with torch.no_grad():
-                if self.input_type == 'grid':
+                if self.input_type == "grid":
                     state = state.unsqueeze(0)
                 action = int(self.policy_net(state).max(1)[1].view(1, 1).item())
         else:
-            obs = observation if isinstance(observation,dict) else observation[-1] #set to last frame if multiframe
+            obs = (
+                observation if isinstance(observation, dict) else observation[-1]
+            )  # set to last frame if multiframe
             action = self._pick_randomly(obs)
         if not self.orthogonal_moves:
             if self._is_valid_action(action, obs):
@@ -129,9 +132,11 @@ class DQNAgent(BaseAgent):
         non_final_next_states = torch.cat([s for s in batch[2] if s is not None])
 
         reward_batch = torch.cat(batch[3])
-        if self.input_type == 'grid' :#no need to unsqueeze for multiframe since concat adds a dimension
-            state_batch = state_batch.unsqueeze(0).transpose(0,1)
-            non_final_next_states = non_final_next_states.unsqueeze(0).transpose(0,1)
+        if (
+            self.input_type == "grid"
+        ):  # no need to unsqueeze for multiframe since concat adds a dimension
+            state_batch = state_batch.unsqueeze(0).transpose(0, 1)
+            non_final_next_states = non_final_next_states.unsqueeze(0).transpose(0, 1)
         # Q(s,a) for all s,a in (state_batch, action_batch)
         state_action_values = self.policy_net(state_batch).gather(1, action_batch)
 
@@ -163,28 +168,34 @@ class DQNAgent(BaseAgent):
         self.target_net.load_state_dict(target_net_state_dict)
 
     def _get_state_from_obs(self, observation):
-        head, grid = self._build_grid(observation) if self.input_type != 'multiframe' else self.concat_frames(observation)
+        head, grid = (
+            self._build_grid(observation)
+            if self.input_type != "multiframe"
+            else self.concat_frames(observation)
+        )
         vector = grid.flatten()
         if self.verbose:
             print("head:", head)
             print(torch.where(vector == 1))
-        if self.input_type == 'vector':
+        if self.input_type == "vector":
             return vector.unsqueeze(0)
-        if self.input_type == 'grid' or self.input_type == 'multiframe':
+        if self.input_type == "grid" or self.input_type == "multiframe":
             return grid.unsqueeze(0)
-        
+
     def concat_frames(self, observation):
         grids = torch.stack([self._build_grid(ob)[1] for ob in observation])
-        head = observation[-1]['agent']
+        head = observation[-1]["agent"]
         return head, grids
-        
+
     def _build_grid(self, observation):
         head = observation["agent"]
         target = observation["target"]
         body = observation["body"]
         grid = torch.full((10, 10), -1.0)
-        
-        grid[head[1], head[0]] += 2 if not any(np.array_equal(head , x) for x in body) else 0
+
+        grid[head[1], head[0]] += (
+            2 if not any(np.array_equal(head, x) for x in body) else 0
+        )
         if np.all(head == target):
             if self.keep_target:
                 grid[target[1], target[0]] += 3
@@ -193,7 +204,7 @@ class DQNAgent(BaseAgent):
 
         for part in body:
             grid[part[1], part[0]] += 1
-        return head,grid
+        return head, grid
 
     def eval(self):
         self.epsilon = 0

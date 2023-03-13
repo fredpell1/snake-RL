@@ -31,35 +31,31 @@ def test_build_value_function():
         {"Linear": [512, 4]},
     ]
     network = util.build_value_function(network_parameters)
-    assert isinstance(network, torch.nn.Module) and \
-        isinstance(network[0], torch.nn.Conv2d)
-    
+    assert isinstance(network, torch.nn.Module) and isinstance(
+        network[0], torch.nn.Conv2d
+    )
+
 
 def test_build_training_functions():
-    value_function = torch.nn.Sequential(
-        torch.nn.Linear(10,10),
-        torch.nn.ReLU()
-    )
-    training_params = {
-        'HuberLoss': [], 
-        'AdamW': [{'lr': 0.0001}, {'amsgrad': True}]
-    }
+    value_function = torch.nn.Sequential(torch.nn.Linear(10, 10), torch.nn.ReLU())
+    training_params = {"HuberLoss": [], "AdamW": [{"lr": 0.0001}, {"amsgrad": True}]}
 
     training_functions = util.build_training_functions(training_params, value_function)
 
-    assert training_functions['value_function'] == value_function and \
-        isinstance(training_functions['loss_function'], torch.nn.HuberLoss) and \
-        isinstance(training_functions['optimizer'], torch.optim.AdamW)
-    
+    assert (
+        training_functions["value_function"] == value_function
+        and isinstance(training_functions["loss_function"], torch.nn.HuberLoss)
+        and isinstance(training_functions["optimizer"], torch.optim.AdamW)
+    )
+
+
 def test_get_model_version_match():
-    config_file = 'configs/dqn/DQN-CNN-V1.yaml'
+    config_file = "configs/dqn/DQN-CNN-V1.yaml"
     version = util.get_model_version(config_file)
-    assert version == 'DQN-CNN-V1'
+    assert version == "DQN-CNN-V1"
+
 
 def test_get_model_version_no_match():
-    config_file = 'configs/dqn/DQN-CNN-V1.txt'
+    config_file = "configs/dqn/DQN-CNN-V1.txt"
     with pytest.raises(ValueError):
         version = util.get_model_version(config_file)
-    
-    
-

@@ -52,16 +52,16 @@ def agent_mode(
     max_step: int = None,
     mode: str = "training",
     verbose: bool = False,
-    fixed_start: bool = False
+    fixed_start: bool = False,
 ):
     max_step = max_step if max_step else sys.maxsize
     rewards = []
     for _ in range(n_episodes):
         agent.reset()
         if env.render_mode == None:
-            observation, info = env.reset(fixed_start = fixed_start)
+            observation, info = env.reset(fixed_start=fixed_start)
         else:
-            observation,info, pixels = env.reset(fixed_start = fixed_start)
+            observation, info, pixels = env.reset(fixed_start=fixed_start)
         episode_reward = 0
         for i in range(max_step):
             action = agent.select_action(observation)
@@ -69,7 +69,7 @@ def agent_mode(
                 observation, reward, target, terminated, info = env.step(action)
             else:
                 observation, reward, target, terminated, info, pixels = env.step(action)
-            
+
             episode_reward += reward
             if verbose:
                 print(reward)

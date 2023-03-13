@@ -63,15 +63,15 @@ class SnakeEnv(gym.Env):
         super().reset(seed=seed)
 
         if fixed_start:
-            self._head_location = np.array([5,5])
-            self._body_location = np.array([[5,6], [5,7]])
-            self._target_location = np.array([7,6])
+            self._head_location = np.array([5, 5])
+            self._body_location = np.array([[5, 6], [5, 7]])
+            self._target_location = np.array([7, 6])
         else:
             # Choose the agent's head location uniformly at random
             self.init_agent()
 
             # We will sample the target's location randomly until it does not coincide with the agent's location
-            
+
             self.spawn_target_random()
 
         observation = self._get_obs()
@@ -79,13 +79,12 @@ class SnakeEnv(gym.Env):
 
         if self.render_mode == "human" or self.render_mode == "rgb_array":
             pixels = self._render_frame()
-            return observation,info, pixels
+            return observation, info, pixels
 
         return observation, info
 
     def init_agent(self):
-        """Initializes agent's location randomly
-        """
+        """Initializes agent's location randomly"""
         self._head_location = self.np_random.integers(
             2, self.size - 2, size=2, dtype=int
         )
@@ -98,11 +97,11 @@ class SnakeEnv(gym.Env):
             self._body_location = np.array([[x, y - 1], [x, y - 2]])
 
     def spawn_target_random(self):
-        """Relocates the target randomly
-        """
+        """Relocates the target randomly"""
         self._target_location = self._head_location
-        while np.array_equal(self._target_location, self._head_location) or \
-            any(np.array_equal(self._target_location,x) for x in self._body_location):
+        while np.array_equal(self._target_location, self._head_location) or any(
+            np.array_equal(self._target_location, x) for x in self._body_location
+        ):
             self._target_location = self.np_random.integers(
                 0, self.size, size=2, dtype=int
             )
