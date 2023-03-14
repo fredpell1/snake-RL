@@ -60,6 +60,7 @@ def test_get_model_version_no_match():
     with pytest.raises(ValueError):
         version = util.get_model_version(config_file)
 
+
 def test_extract_model_from_output_file():
     output_file = "outputs/dqn-cnn/dqn-cnn-v1.txt"
     model = util.extract_model_from_output_file(output_file)

@@ -167,7 +167,8 @@ def get_model_version(config_file: str) -> str:
         raise ValueError("Invalid file format")
     return version
 
-def extract_model_from_output_file(output_file: str)->str:
+
+def extract_model_from_output_file(output_file: str) -> str:
     """Extract model version from output file to save other metrics in other files
 
     Args:
@@ -185,6 +186,7 @@ def extract_model_from_output_file(output_file: str)->str:
     else:
         raise ValueError("Invalid output file")
     return model
+
 
 def train_and_save(
     agent: BaseAgent,
@@ -208,7 +210,7 @@ def train_and_save(
     if agent.input_type == "multiframe":
         env = MultiFrame(env, agent.n_frames)
     _ = env.reset()
-    rewards, losses,_,_ = agent_mode(
+    rewards, losses, _, _ = agent_mode(
         env=env,
         n_episodes=n_episodes,
         agent=agent,
@@ -239,7 +241,7 @@ def test(agent: BaseAgent, n_episodes: int, max_step: int, verbose: bool = False
     if agent.input_type == "multiframe":
         env = MultiFrame(env, agent.n_frames)
     agent.eval()
-    rewards,losses,targets,lengths = agent_mode(
+    rewards, losses, targets, lengths = agent_mode(
         env=env,
         n_episodes=n_episodes,
         agent=agent,

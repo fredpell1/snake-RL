@@ -58,7 +58,7 @@ class DQNAgent(BaseAgent):
         self.n_frames = n_frames
         self.fixed_start = fixed_start
         self.losses = []
-        self.mode = 'training'
+        self.mode = "training"
 
     def _save_transition(self, transition):
         self.buffer.append(transition)
@@ -73,7 +73,7 @@ class DQNAgent(BaseAgent):
         epsilon = self.epsilon_min + (self.epsilon - self.epsilon_min) * np.exp(
             -1.0 * self.n_steps / self.epsilon_decay
         )
-        if self.mode == 'training':
+        if self.mode == "training":
             self.n_steps += 1
         action = None
         if epsilon < p:  # greedy choice
@@ -213,7 +213,7 @@ class DQNAgent(BaseAgent):
     def eval(self):
         self.epsilon = 0
         self.epsilon_min = 0
-        self.mode = 'testing'
+        self.mode = "testing"
 
     def save(self, filename):
         epsilon = self.epsilon_min + (self.epsilon - self.epsilon_min) * np.exp(
