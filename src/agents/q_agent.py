@@ -74,16 +74,18 @@ class DQNAgent(BaseAgent):
         )
         self.n_steps += 1
         action = None
-        if epsilon < p:
+        if epsilon < p:  # greedy choice
             with torch.no_grad():
                 if self.input_type == "grid":
                     state = state.unsqueeze(0)
                 action = int(self.policy_net(state).max(1)[1].view(1, 1).item())
-        else:
+        else:  # random choice
             obs = (
                 observation if isinstance(observation, dict) else observation[-1]
             )  # set to last frame if multiframe
             action = self._pick_randomly(obs)
+
+        # prohibit orthogonal moves
         if not self.orthogonal_moves:
             if self._is_valid_action(action, obs):
                 self.prev_action = action
