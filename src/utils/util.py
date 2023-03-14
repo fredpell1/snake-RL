@@ -168,6 +168,26 @@ def get_model_version(config_file: str) -> str:
     return version
 
 
+def extract_model_from_output_file(output_file: str) -> str:
+    """Extract model version from output file to save other metrics in other files
+
+    Args:
+        output_file (str): output file
+
+    Raises:
+        ValueError: incorrect output file
+
+    Returns:
+        str: model version
+    """
+    model = re.search(r"outputs/(?P<model>.*)\.txt", output_file)
+    if model:
+        model = model.group("model")
+    else:
+        raise ValueError("Invalid output file")
+    return model
+
+
 def train_and_save(
     agent: BaseAgent,
     n_episodes: int,
@@ -190,7 +210,7 @@ def train_and_save(
     if agent.input_type == "multiframe":
         env = MultiFrame(env, agent.n_frames)
     _ = env.reset()
-    rewards, losses = agent_mode(
+    rewards, losses, _, _ = agent_mode(
         env=env,
         n_episodes=n_episodes,
         agent=agent,
@@ -202,7 +222,8 @@ def train_and_save(
     with open(output_file, "ab") as f:
         f.write(b"\n")
         np.savetxt(f, rewards)
-    with open(f"losses/dqn-cnn-v2.txt", "ab") as f:
+    model = extract_model_from_output_file(output_file)
+    with open(f"losses/{model}.txt", "ab") as f:
         f.write(b"\n")
         np.savetxt(f, losses)
 
@@ -220,7 +241,7 @@ def test(agent: BaseAgent, n_episodes: int, max_step: int, verbose: bool = False
     if agent.input_type == "multiframe":
         env = MultiFrame(env, agent.n_frames)
     agent.eval()
-    agent_mode(
+    rewards, losses, targets, lengths = agent_mode(
         env=env,
         n_episodes=n_episodes,
         agent=agent,
