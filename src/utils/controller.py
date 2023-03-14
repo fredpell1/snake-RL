@@ -56,6 +56,8 @@ def agent_mode(
 ):
     max_step = max_step if max_step else sys.maxsize
     rewards = []
+    targets = []
+    lengths = []
     for _ in range(n_episodes):
         agent.reset()
         if env.render_mode == None:
@@ -63,6 +65,8 @@ def agent_mode(
         else:
             observation, info, pixels = env.reset(fixed_start=fixed_start)
         episode_reward = 0
+        episode_targets = 0
+        episode_length = 3
         for i in range(max_step):
             action = agent.select_action(observation)
             if env.render_mode == None:
@@ -75,10 +79,14 @@ def agent_mode(
                 print(reward)
             if target:
                 env.eat_apple()
+                episode_targets += 1
+                episode_length += 1
             if mode == "training":
                 agent.update(reward, observation, action, terminated)
             if terminated:
                 break
         rewards.append(episode_reward)
+        targets.append(episode_targets)
+        lengths.append(episode_length)
     env.close()
     return rewards, agent.losses
