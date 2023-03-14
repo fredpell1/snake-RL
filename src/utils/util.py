@@ -208,7 +208,7 @@ def train_and_save(
     if agent.input_type == "multiframe":
         env = MultiFrame(env, agent.n_frames)
     _ = env.reset()
-    rewards, losses = agent_mode(
+    rewards, losses,_,_ = agent_mode(
         env=env,
         n_episodes=n_episodes,
         agent=agent,
@@ -239,7 +239,7 @@ def test(agent: BaseAgent, n_episodes: int, max_step: int, verbose: bool = False
     if agent.input_type == "multiframe":
         env = MultiFrame(env, agent.n_frames)
     agent.eval()
-    agent_mode(
+    rewards,losses,targets,lengths = agent_mode(
         env=env,
         n_episodes=n_episodes,
         agent=agent,

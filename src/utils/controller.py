@@ -89,4 +89,4 @@ def agent_mode(
         targets.append(episode_targets)
         lengths.append(episode_length)
     env.close()
-    return rewards, agent.losses
+    return rewards, agent.losses, targets, lengths
