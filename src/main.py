@@ -15,7 +15,6 @@ def main(config_file, agent_folder, n_episodes, output_file, user, verbose):
         train_and_save(agent, n_episodes, 400, file, output_file, verbose)
         test(agent, 10, 50, verbose)
 
-
 if __name__ == "__main__":
     parser = ArgumentParser()
     parser.add_argument("-c", "--config")
