@@ -53,13 +53,17 @@ def agent_mode(
     mode: str = "training",
     verbose: bool = False,
     fixed_start: bool = False,
-    keep_stats: bool = False
+    keep_stats: bool = False,
+    periodic_save: bool = False, 
+    agent_file: str = None,
+    output_file: str = None,
+    save_frequency: int = 100
 ):
     max_step = max_step if max_step else sys.maxsize
     rewards = []
     targets = []
     lengths = []
-    for _ in range(n_episodes):
+    for ep in range(n_episodes):
         agent.reset()
         if env.render_mode == None:
             observation, info = env.reset(fixed_start=fixed_start)
@@ -87,9 +91,19 @@ def agent_mode(
                 agent.update(reward, observation, action, terminated)
             if terminated:
                 break
+        
         rewards.append(episode_reward)
         if keep_stats:
             targets.append(episode_targets)
             lengths.append(episode_length)
+        
+        if periodic_save and agent_file is not None and output_file is not None:
+            if ep % save_frequency == 0:
+                agent.save(agent_file)
+                with open(output_file, "ab") as f:
+                    f.write(b"\n")
+                    np.savetxt(f, rewards)
+                rewards = [] #emptying to avoid appending duplicates
+
     env.close()
     return rewards, targets, lengths

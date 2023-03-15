@@ -195,6 +195,8 @@ def train_and_save(
     filename: str,
     output_file: str,
     verbose: bool = False,
+    periodic_save: bool = True,
+    save_frequency: int = 100
 ):
     """Train the agent and saves its parameters
 
@@ -218,6 +220,10 @@ def train_and_save(
             max_step=max_step,
             verbose=verbose,
             fixed_start=agent.fixed_start,
+            agent_file = filename, 
+            output_file= output_file,
+            periodic_save=periodic_save,
+            save_frequency=save_frequency
         )
         agent.save(filename)
         with open(output_file, "ab") as f:
