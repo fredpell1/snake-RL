@@ -210,23 +210,26 @@ def train_and_save(
     if agent.input_type == "multiframe":
         env = MultiFrame(env, agent.n_frames)
     _ = env.reset()
-    rewards, losses, _, _ = agent_mode(
-        env=env,
-        n_episodes=n_episodes,
-        agent=agent,
-        max_step=max_step,
-        verbose=verbose,
-        fixed_start=agent.fixed_start,
-    )
-    agent.save(filename)
-    with open(output_file, "ab") as f:
-        f.write(b"\n")
-        np.savetxt(f, rewards)
-    model = extract_model_from_output_file(output_file)
-    with open(f"losses/{model}.txt", "ab") as f:
-        f.write(b"\n")
-        np.savetxt(f, losses)
-
+    try:
+        rewards, _, _ = agent_mode(
+            env=env,
+            n_episodes=n_episodes,
+            agent=agent,
+            max_step=max_step,
+            verbose=verbose,
+            fixed_start=agent.fixed_start,
+        )
+        agent.save(filename)
+        with open(output_file, "ab") as f:
+            f.write(b"\n")
+            np.savetxt(f, rewards)
+    except:
+        #saving in case something happens
+        agent.save(filename)
+        with open(output_file, "ab") as f:
+            f.write(b"\n")
+            np.savetxt(f, rewards)
+        model = extract_model_from_output_file(output_file)
 
 def test(agent: BaseAgent, n_episodes: int, max_step: int, verbose: bool = False):
     """Test the agent
@@ -241,11 +244,12 @@ def test(agent: BaseAgent, n_episodes: int, max_step: int, verbose: bool = False
     if agent.input_type == "multiframe":
         env = MultiFrame(env, agent.n_frames)
     agent.eval()
-    rewards, losses, targets, lengths = agent_mode(
+    rewards, targets, lengths = agent_mode(
         env=env,
         n_episodes=n_episodes,
         agent=agent,
         max_step=max_step,
         mode="testing",
         verbose=verbose,
+        keep_stats=True
     )
