@@ -99,6 +99,7 @@ def agent_mode(
         
         if periodic_save and agent_file is not None and output_file is not None:
             if ep % save_frequency == 0:
+                print(f'saving after episode {ep}')
                 agent.save(agent_file)
                 with open(output_file, "ab") as f:
                     f.write(b"\n")

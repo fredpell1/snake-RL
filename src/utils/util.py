@@ -232,10 +232,7 @@ def train_and_save(
     except:
         #saving in case something happens
         agent.save(filename)
-        with open(output_file, "ab") as f:
-            f.write(b"\n")
-            np.savetxt(f, rewards)
-        model = extract_model_from_output_file(output_file)
+        
 
 def test(agent: BaseAgent, n_episodes: int, max_step: int, verbose: bool = False):
     """Test the agent
@@ -259,3 +256,4 @@ def test(agent: BaseAgent, n_episodes: int, max_step: int, verbose: bool = False
         verbose=verbose,
         keep_stats=True
     )
+    print(targets, lengths)
