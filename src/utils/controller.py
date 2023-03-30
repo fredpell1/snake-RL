@@ -53,12 +53,17 @@ def agent_mode(
     mode: str = "training",
     verbose: bool = False,
     fixed_start: bool = False,
+    keep_stats: bool = False,
+    periodic_save: bool = False,
+    agent_file: str = None,
+    output_file: str = None,
+    save_frequency: int = 100,
 ):
     max_step = max_step if max_step else sys.maxsize
     rewards = []
     targets = []
     lengths = []
-    for _ in range(n_episodes):
+    for ep in range(n_episodes):
         agent.reset()
         if env.render_mode == None:
             observation, info = env.reset(fixed_start=fixed_start)
@@ -79,14 +84,27 @@ def agent_mode(
                 print(reward)
             if target:
                 env.eat_apple()
-                episode_targets += 1
-                episode_length += 1
+                if keep_stats:
+                    episode_targets += 1
+                    episode_length += 1
             if mode == "training":
                 agent.update(reward, observation, action, terminated)
             if terminated:
                 break
+
         rewards.append(episode_reward)
-        targets.append(episode_targets)
-        lengths.append(episode_length)
+        if keep_stats:
+            targets.append(episode_targets)
+            lengths.append(episode_length)
+
+        if periodic_save and agent_file is not None and output_file is not None:
+            if ep % save_frequency == 0:
+                print(f"saving after episode {ep}")
+                agent.save(agent_file)
+                with open(output_file, "ab") as f:
+                    f.write(b"\n")
+                    np.savetxt(f, rewards)
+                rewards = []  # emptying to avoid appending duplicates
+
     env.close()
-    return rewards, agent.losses, targets, lengths
+    return rewards, targets, lengths
