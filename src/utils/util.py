@@ -196,7 +196,7 @@ def train_and_save(
     output_file: str,
     verbose: bool = False,
     periodic_save: bool = True,
-    save_frequency: int = 100
+    save_frequency: int = 100,
 ):
     """Train the agent and saves its parameters
 
@@ -220,19 +220,19 @@ def train_and_save(
             max_step=max_step,
             verbose=verbose,
             fixed_start=agent.fixed_start,
-            agent_file = filename, 
-            output_file= output_file,
+            agent_file=filename,
+            output_file=output_file,
             periodic_save=periodic_save,
-            save_frequency=save_frequency
+            save_frequency=save_frequency,
         )
         agent.save(filename)
         with open(output_file, "ab") as f:
             f.write(b"\n")
             np.savetxt(f, rewards)
     except:
-        #saving in case something happens
+        # saving in case something happens
         agent.save(filename)
-        
+
 
 def test(agent: BaseAgent, n_episodes: int, max_step: int, verbose: bool = False):
     """Test the agent
@@ -254,6 +254,6 @@ def test(agent: BaseAgent, n_episodes: int, max_step: int, verbose: bool = False
         max_step=max_step,
         mode="testing",
         verbose=verbose,
-        keep_stats=True
+        keep_stats=True,
     )
     print(targets, lengths)

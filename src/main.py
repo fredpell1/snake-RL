@@ -6,14 +6,26 @@ import yaml
 import sys
 
 
-def main(config_file, agent_folder, n_episodes, output_file, user, verbose, periodic_save, frequency):
+def main(
+    config_file,
+    agent_folder,
+    n_episodes,
+    output_file,
+    user,
+    verbose,
+    periodic_save,
+    frequency,
+):
     if user:
         user_mode(verbose)
     else:
         agent = get_agent_type(config_file)
         agent, file = load_config_file(agent, config_file, agent_folder, verbose)
-        train_and_save(agent, n_episodes, 500, file, output_file, verbose, periodic_save, frequency)
+        train_and_save(
+            agent, n_episodes, 500, file, output_file, verbose, periodic_save, frequency
+        )
         test(agent, 10, 50, verbose)
+
 
 if __name__ == "__main__":
     parser = ArgumentParser()
@@ -33,6 +45,6 @@ if __name__ == "__main__":
         output_file=args.output.strip(),
         user=args.user,
         verbose=args.verbose,
-        periodic_save=args.save, 
-        frequency=args.frequency
+        periodic_save=args.save,
+        frequency=args.frequency,
     )

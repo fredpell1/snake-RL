@@ -156,8 +156,8 @@ class DQNAgent(BaseAgent):
         # compute loss
         loss = self.loss_function(state_action_values, target.unsqueeze(1))
         if loss.item() > 0.5:
-            print(self.n_steps,loss.item())
-        #self.losses.append(loss.item())
+            print(self.n_steps, loss.item())
+        # self.losses.append(loss.item())
         # optimize and gradient clipping
         self.optimizer.zero_grad()
         loss.backward()
