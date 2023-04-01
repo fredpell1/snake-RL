@@ -7,6 +7,7 @@ import yaml
 from collections import ChainMap
 import re
 import os
+import json
 from agents.td_agent import *
 from agents.q_agent import *
 
@@ -234,7 +235,14 @@ def train_and_save(
         agent.save(filename)
 
 
-def test(agent: BaseAgent, n_episodes: int, max_step: int, verbose: bool = False):
+def test(
+    agent: BaseAgent,
+    n_episodes: int,
+    max_step: int,
+    verbose: bool = False,
+    demo: bool = False,
+    results_file: str = None,
+):
     """Test the agent
 
     Args:
@@ -242,8 +250,11 @@ def test(agent: BaseAgent, n_episodes: int, max_step: int, verbose: bool = False
         n_episodes (int): Number of episodes in testing session
         max_step (int): Max steps per episode
         verbose (bool, optional): Prints more information. Defaults to False.
+        demo (bool, optional): Show the game screen. Defaults to False.
+        results_file (str, optional): file to save results of the test to. If None, will print the results.
     """
-    env = envs.SnakeEnv(render_mode="human", size=10)
+    render_mode = "human" if demo else None
+    env = envs.SnakeEnv(render_mode=render_mode, size=10)
     if agent.input_type == "multiframe":
         env = MultiFrame(env, agent.n_frames)
     agent.eval()
@@ -256,4 +267,10 @@ def test(agent: BaseAgent, n_episodes: int, max_step: int, verbose: bool = False
         verbose=verbose,
         keep_stats=True,
     )
-    print(targets, lengths)
+    if results_file:
+        results = {"rewards": rewards, "targets": targets, "lengths": lengths}
+        with open(results_file, "w") as f:
+            json.dump(results, f)
+    else:
+        print("targets:", targets)
+        print("lengths:", lengths)
