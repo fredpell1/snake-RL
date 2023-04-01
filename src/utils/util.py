@@ -251,7 +251,7 @@ def test(
         max_step (int): Max steps per episode
         verbose (bool, optional): Prints more information. Defaults to False.
         demo (bool, optional): Show the game screen. Defaults to False.
-        results_file (str, optional): file to save results of the test to. If None, will print the results. 
+        results_file (str, optional): file to save results of the test to. If None, will print the results.
     """
     render_mode = "human" if demo else None
     env = envs.SnakeEnv(render_mode=render_mode, size=10)
@@ -268,13 +268,9 @@ def test(
         keep_stats=True,
     )
     if results_file:
-        results = {
-            'rewards': rewards,
-            'targets': targets,
-            'lengths': lengths
-        }
-        with open(results_file, 'w') as f:
+        results = {"rewards": rewards, "targets": targets, "lengths": lengths}
+        with open(results_file, "w") as f:
             json.dump(results, f)
     else:
-        print('targets:',targets)
-        print('lengths:',lengths)
+        print("targets:", targets)
+        print("lengths:", lengths)

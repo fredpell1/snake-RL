@@ -15,23 +15,30 @@ def main(
     verbose,
     periodic_save,
     frequency,
-    results_file
+    results_file,
 ):
-    if mode == 'user':
+    if mode == "user":
         user_mode(verbose)
     else:
         agent = get_agent_type(config_file)
         agent, file = load_config_file(agent, config_file, agent_folder, verbose)
-        if mode == 'train':
+        if mode == "train":
             train_and_save(
-                agent, n_episodes, 500, file, output_file, verbose, periodic_save, frequency
+                agent,
+                n_episodes,
+                500,
+                file,
+                output_file,
+                verbose,
+                periodic_save,
+                frequency,
             )
-        elif mode == 'demo':
-            test(agent, n_episodes,5000,verbose,True)
-        elif mode == 'test':
+        elif mode == "demo":
+            test(agent, n_episodes, 5000, verbose, True)
+        elif mode == "test":
             test(agent, n_episodes, 5000, verbose, False, results_file)
         else:
-            raise ValueError('unrecognized mode. Please use: user,train,demo or test.')
+            raise ValueError("unrecognized mode. Please use: user,train,demo or test.")
 
 
 if __name__ == "__main__":
@@ -55,5 +62,5 @@ if __name__ == "__main__":
         verbose=args.verbose,
         periodic_save=args.save,
         frequency=args.frequency,
-        results_file=args.results_file
+        results_file=args.results_file,
     )
